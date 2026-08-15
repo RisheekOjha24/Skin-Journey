@@ -11,7 +11,7 @@ import { Scan } from "@/types";
 import { SCAN_TYPE_LABELS } from "@/config/scan.config";
 import { API_CONFIG } from "@/config/api.config";
 import { ROUTES } from "@/config/routes.config";
-import { cn } from "@/lib/utils";
+import { cn, parseUTCDate } from "@/lib/utils";
 
 interface ScanCardProps {
   scan: Scan;
@@ -65,7 +65,7 @@ export function ScanCard({ scan, selected = false, onSelectChange, onDeleteReque
             <Badge variant="secondary">{SCAN_TYPE_LABELS[scan.scanType]}</Badge>
             <span className="font-mono text-sm font-medium">{scan.overallScore ?? "—"}</span>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">{format(new Date(scan.capturedAt), "MMM d, yyyy")}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{format(parseUTCDate(scan.capturedAt), "MMM d, yyyy · h:mm a")}</p>
         </CardContent>
       </Link>
     </Card>

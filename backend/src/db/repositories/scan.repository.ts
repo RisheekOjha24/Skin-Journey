@@ -29,10 +29,11 @@ export interface CreateScanInput {
 export const scanRepository = {
   create(input: CreateScanInput): ScanRecord {
     const id = generateId("scan");
+    const capturedAt = input.capturedAt ?? new Date().toISOString();
     db.prepare(
       `INSERT INTO scans
         (id, user_id, scan_type, image_path, overlay_image_path, overall_score, metrics_json, raw_response_json, captured_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, datetime('now')))`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       id,
       input.userId,
@@ -42,7 +43,7 @@ export const scanRepository = {
       input.overallScore,
       JSON.stringify(input.metrics),
       JSON.stringify(input.rawResponse ?? null),
-      input.capturedAt ?? null
+      capturedAt
     );
 
     return this.findById(id)!;

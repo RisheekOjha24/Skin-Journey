@@ -25,8 +25,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NAV_ITEMS } from "./nav.config";
+import skinLogo from "@/assets/skin_analysis_icon.png";
 import { SITE_CONFIG } from "@/config/site.config";
 import { useAuth } from "@/lib/auth-context";
+import Image from "next/image";
 
 function initials(name: string): string {
   return name
@@ -45,9 +47,14 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-1 py-1">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Leaf className="h-4 w-4" />
+          <div className="size-8 shrink-0 overflow-hidden rounded-full">
+            <Image
+              src={skinLogo}
+              alt="Skin Logo"
+              className="h-full w-full object-contain"
+            />
           </div>
+
           <span className="font-display text-lg font-medium group-data-[collapsible=icon]:hidden">
             {SITE_CONFIG.name}
           </span>
@@ -59,11 +66,18 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {NAV_ITEMS.map((item) => {
-                const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/dashboard" &&
+                    pathname.startsWith(item.href));
                 const Icon = item.icon;
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.label}
+                    >
                       <Link href={item.href}>
                         <Icon />
                         <span>{item.label}</span>
@@ -82,15 +96,22 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent"
+                >
                   <Avatar className="h-7 w-7 rounded-full">
                     <AvatarFallback className="rounded-full text-xs">
                       {user ? initials(user.displayName) : "?"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate text-sm font-medium">{user?.displayName}</span>
-                    <span className="truncate text-xs text-sidebar-foreground/60">{user?.email}</span>
+                    <span className="truncate text-sm font-medium">
+                      {user?.displayName}
+                    </span>
+                    <span className="truncate text-xs text-sidebar-foreground/60">
+                      {user?.email}
+                    </span>
                   </div>
                   <ChevronsUpDown className="ml-auto h-4 w-4 group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
@@ -98,7 +119,10 @@ export function AppSidebar() {
               <DropdownMenuContent side="top" align="start" className="w-56">
                 <DropdownMenuLabel>{user?.displayName}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  onClick={logout}
+                  className="text-destructive focus:text-destructive"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign out
                 </DropdownMenuItem>

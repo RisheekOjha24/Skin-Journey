@@ -13,6 +13,7 @@ import { Scan } from "@/types";
 import { ApiClientError } from "@/lib/api-client";
 import { SCAN_TYPE_LABELS } from "@/config/scan.config";
 import { API_CONFIG } from "@/config/api.config";
+import { parseUTCDate } from "@/lib/utils";
 
 export default function ScanDetailPage({ params }: { params: { id: string } }) {
   const [scan, setScan] = React.useState<Scan | null>(null);
@@ -53,7 +54,7 @@ export default function ScanDetailPage({ params }: { params: { id: string } }) {
               <CardContent className="flex items-center justify-between p-6">
                 <div>
                   <Badge variant="secondary">{SCAN_TYPE_LABELS[scan.scanType]}</Badge>
-                  <p className="mt-2 text-sm text-muted-foreground">{format(new Date(scan.capturedAt), "EEEE, MMMM d, yyyy")}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{format(parseUTCDate(scan.capturedAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Overall score</p>

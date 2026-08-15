@@ -16,6 +16,7 @@ import { ApiClientError } from "@/lib/api-client";
 import { API_CONFIG } from "@/config/api.config";
 import { SKIN_METRIC_LABELS, SKIN_METRIC_ICONS, SkinMetric } from "@/config/metrics.config";
 import { GitCompareArrows } from "lucide-react";
+import { parseUTCDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/routes.config";
 import { CustomSelect } from "@/components/ui/custom-select";
@@ -103,7 +104,7 @@ export default function ComparePage() {
               onValueChange={setBeforeId}
               options={scans.map((s) => ({
                 value: s.id,
-                label: `${format(new Date(s.capturedAt), "MMM d, yyyy · h:mm a")} · Score ${s.overallScore ?? "—"}`,
+                label: `${format(parseUTCDate(s.capturedAt), "MMM d, yyyy · h:mm a")} · Score ${s.overallScore ?? "—"}`,
               }))}
             />
           </div>
@@ -115,7 +116,7 @@ export default function ComparePage() {
               onValueChange={setAfterId}
               options={scans.map((s) => ({
                 value: s.id,
-                label: `${format(new Date(s.capturedAt), "MMM d, yyyy · h:mm a")} · Score ${s.overallScore ?? "—"}`,
+                label: `${format(parseUTCDate(s.capturedAt), "MMM d, yyyy · h:mm a")} · Score ${s.overallScore ?? "—"}`,
               }))}
             />
           </div>
@@ -143,7 +144,7 @@ export default function ComparePage() {
                       {i === 0 ? "Before" : "After"}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(scan.capturedAt), "MMM d, yyyy")}
+                      {format(parseUTCDate(scan.capturedAt), "MMM d, yyyy · h:mm a")}
                     </p>
                   </div>
                   <p className="font-display text-2xl font-medium">

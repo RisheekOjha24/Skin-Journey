@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Scan, Milestone } from "@/types";
 import { SCAN_TYPE_LABELS } from "@/config/scan.config";
 import { MILESTONE_CATEGORY_LABELS } from "@/config/milestones.config";
+import { parseUTCDate } from "@/lib/utils";
 
 interface ActivityItem {
   id: string;
@@ -69,7 +70,7 @@ export function RecentActivity({
               </p>
             </div>
             <span className="shrink-0 text-xs text-muted-foreground">
-              {format(new Date(item.date), "MMM d")}
+              {format(parseUTCDate(item.date), "MMM d · h:mm a")}
             </span>
           </div>
         ))}

@@ -7,6 +7,18 @@ import { ApiError } from "../utils/api-error.util";
 import { SCAN_TYPE, PAGINATION_DEFAULTS } from "../config/constants";
 import { logger } from "../utils/logger.util";
 
+function normalizeUtcIsoString(dateStr: string): string {
+  if (!dateStr) return new Date().toISOString();
+  let s = dateStr.trim();
+  if (/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(s)) {
+    s = s.replace(" ", "T");
+  }
+  if (!/[Z+-]\d{2}:?\d{2}$|Z$/.test(s)) {
+    s += "Z";
+  }
+  return s;
+}
+
 function toPublicScan(scan: {
   id: string;
   scan_type: string;
@@ -24,8 +36,8 @@ function toPublicScan(scan: {
     overlayImageUrl: scan.overlay_image_path ? `/uploads/${path.basename(scan.overlay_image_path)}` : null,
     overallScore: scan.overall_score,
     metrics: JSON.parse(scan.metrics_json) as MetricsMap,
-    capturedAt: scan.captured_at,
-    createdAt: scan.created_at,
+    capturedAt: normalizeUtcIsoString(scan.captured_at),
+    createdAt: normalizeUtcIsoString(scan.created_at),
   };
 }
 
@@ -137,7 +149,7 @@ export const scanService = {
 
     const scoreHistory = allScans
       .filter((s) => s.overall_score !== null)
-      .map((s) => ({ date: s.captured_at, score: s.overall_score as number, scanId: s.id }));
+      .map((s) => ({ date: normalizeUtcIsoString(s.captured_at), score: s.overall_score as number, scanId: s.id }));
 
     const trend = calculateTrend(scoreHistory.map((s) => s.score));
 
@@ -149,7 +161,7 @@ export const scanService = {
       for (const [metric, value] of Object.entries(metrics)) {
         if (value === undefined || value === null) continue;
         if (!metricSeries[metric]) metricSeries[metric] = [];
-        metricSeries[metric].push({ date: scan.captured_at, value });
+        metricSeries[metric].push({ date: normalizeUtcIsoString(scan.captured_at), value });
       }
     }
 
