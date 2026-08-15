@@ -19,4 +19,7 @@ export const milestoneService = {
   delete(id: string) {
     return apiRequest<{ deleted: boolean }>(`/api/milestones/${id}`, { method: "DELETE" });
   },
+  bulkDelete(ids: string[]) {
+    return apiRequest<{ deleted: boolean; count: number }>("/api/milestones", { method: "DELETE", body: { ids } });
+  },
 };

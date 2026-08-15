@@ -7,6 +7,7 @@ import {
   createJournalEntrySchema,
   updateJournalEntrySchema,
   listJournalSchema,
+  bulkDeleteJournalSchema,
 } from "../validations/journal.validation";
 
 const router = Router();
@@ -14,6 +15,7 @@ router.use(requireAuth);
 
 router.post("/", validateRequest(createJournalEntrySchema), asyncHandler(journalController.create));
 router.get("/", validateRequest(listJournalSchema), asyncHandler(journalController.list));
+router.delete("/", validateRequest(bulkDeleteJournalSchema), asyncHandler(journalController.bulkDelete));
 router.get("/:id", asyncHandler(journalController.getById));
 router.patch("/:id", validateRequest(updateJournalEntrySchema), asyncHandler(journalController.update));
 router.delete("/:id", asyncHandler(journalController.delete));

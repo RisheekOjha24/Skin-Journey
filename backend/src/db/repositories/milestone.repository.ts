@@ -43,6 +43,14 @@ export const milestoneRepository = {
     return result.changes > 0;
   },
 
+  bulkDelete(ids: string[], userId: string): number {
+    const placeholders = ids.map(() => "?").join(", ");
+    const result = db
+      .prepare(`DELETE FROM milestones WHERE id IN (${placeholders}) AND user_id = ?`)
+      .run(...ids, userId);
+    return result.changes;
+  },
+
   listForUser(userId: string): MilestoneRecord[] {
     return db
       .prepare("SELECT * FROM milestones WHERE user_id = ? ORDER BY occurred_at ASC")

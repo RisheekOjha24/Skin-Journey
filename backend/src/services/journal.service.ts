@@ -41,6 +41,10 @@ export const journalService = {
     journalRepository.delete(entryId, userId);
   },
 
+  bulkDelete(userId: string, ids: string[]) {
+    return journalRepository.bulkDelete(ids, userId);
+  },
+
   list(userId: string, opts: { page?: number; limit?: number }) {
     const { rows, total } = journalRepository.listForUser(userId, opts);
     return {

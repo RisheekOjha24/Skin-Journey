@@ -98,6 +98,14 @@ export const journalRepository = {
     return result.changes > 0;
   },
 
+  bulkDelete(ids: string[], userId: string): number {
+    const placeholders = ids.map(() => "?").join(", ");
+    const result = db
+      .prepare(`DELETE FROM journal_entries WHERE id IN (${placeholders}) AND user_id = ?`)
+      .run(...ids, userId);
+    return result.changes;
+  },
+
   listForUser(userId: string, opts: { page?: number; limit?: number } = {}) {
     const page = opts.page ?? PAGINATION_DEFAULTS.page;
     const limit = opts.limit ?? PAGINATION_DEFAULTS.limit;

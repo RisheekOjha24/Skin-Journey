@@ -30,3 +30,11 @@ export const listJournalSchema = z.object({
   }),
   params: z.object({}).optional(),
 });
+
+export const bulkDeleteJournalSchema = z.object({
+  body: z.object({
+    ids: z.array(z.string().min(1)).min(1, "At least one id is required"),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});

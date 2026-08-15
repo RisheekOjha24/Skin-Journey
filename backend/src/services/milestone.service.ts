@@ -29,4 +29,8 @@ export const milestoneService = {
     }
     milestoneRepository.delete(milestoneId, userId);
   },
+
+  bulkDelete(userId: string, ids: string[]) {
+    return milestoneRepository.bulkDelete(ids, userId);
+  },
 };

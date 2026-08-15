@@ -7,16 +7,19 @@ interface BulkDeleteBarProps {
   selectedCount: number;
   onDelete: () => void;
   onClear: () => void;
+  itemLabel?: string;
 }
 
-export function BulkDeleteBar({ selectedCount, onDelete, onClear }: BulkDeleteBarProps) {
+export function BulkDeleteBar({ selectedCount, onDelete, onClear, itemLabel = "item" }: BulkDeleteBarProps) {
   if (selectedCount === 0) return null;
+
+  const plural = selectedCount === 1 ? itemLabel : `${itemLabel}s`;
 
   return (
     <div className="fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
       <div className="flex items-center gap-3 rounded-pill border border-border bg-card px-4 py-2.5 shadow-raised animate-in fade-in-0 slide-in-from-bottom-2">
         <span className="text-sm font-medium">
-          {selectedCount} scan{selectedCount === 1 ? "" : "s"} selected
+          {selectedCount} {plural} selected
         </span>
         <Button size="sm" variant="destructive" className="gap-1.5" onClick={onDelete}>
           <Trash2 className="h-3.5 w-3.5" />

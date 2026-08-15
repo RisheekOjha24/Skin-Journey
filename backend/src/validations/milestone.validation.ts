@@ -17,3 +17,11 @@ export const milestoneIdParamSchema = z.object({
   query: z.object({}).optional(),
   params: z.object({ id: z.string().min(1) }),
 });
+
+export const bulkDeleteMilestoneSchema = z.object({
+  body: z.object({
+    ids: z.array(z.string().min(1)).min(1, "At least one id is required"),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});

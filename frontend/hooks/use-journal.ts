@@ -43,5 +43,10 @@ export function useJournal() {
     setEntries((prev) => prev.filter((e) => e.id !== id));
   }, []);
 
-  return { entries, isLoading, error, refresh: load, createEntry, deleteEntry };
+  const deleteEntries = React.useCallback(async (ids: string[]) => {
+    await journalService.bulkDelete(ids);
+    setEntries((prev) => prev.filter((e) => !ids.includes(e.id)));
+  }, []);
+
+  return { entries, isLoading, error, refresh: load, createEntry, deleteEntry, deleteEntries };
 }

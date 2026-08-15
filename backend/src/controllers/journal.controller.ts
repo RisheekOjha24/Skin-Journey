@@ -20,6 +20,12 @@ export const journalController = {
     sendSuccess(res, { deleted: true });
   },
 
+  async bulkDelete(req: AuthenticatedRequest, res: Response) {
+    const { ids } = req.body as { ids: string[] };
+    const count = journalService.bulkDelete(req.user!.id, ids);
+    sendSuccess(res, { deleted: true, count });
+  },
+
   async list(req: AuthenticatedRequest, res: Response) {
     const { page, limit } = req.query as unknown as { page: number; limit: number };
     const result = journalService.list(req.user!.id, { page, limit });

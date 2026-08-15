@@ -19,4 +19,10 @@ export const milestoneController = {
     milestoneService.delete(req.user!.id, req.params.id);
     sendSuccess(res, { deleted: true });
   },
+
+  async bulkDelete(req: AuthenticatedRequest, res: Response) {
+    const { ids } = req.body as { ids: string[] };
+    const count = milestoneService.bulkDelete(req.user!.id, ids);
+    sendSuccess(res, { deleted: true, count });
+  },
 };

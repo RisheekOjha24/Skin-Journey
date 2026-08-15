@@ -7,18 +7,60 @@ import { ErrorState } from "@/components/common/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MilestoneForm } from "@/components/milestones/milestone-form";
 import { MilestoneList } from "@/components/milestones/milestone-list";
+import { BulkDeleteBar } from "@/components/scan/bulk-delete-bar";
+import { DeleteScanDialog } from "@/components/scan/delete-scan-dialog";
 import { useMilestones } from "@/hooks/use-milestones";
 import { MESSAGES } from "@/config/messages.config";
 import { Flag } from "lucide-react";
 
 export default function MilestonesPage() {
-  const { milestones, isLoading, error, refresh, createMilestone, deleteMilestone } = useMilestones();
+  const { milestones, isLoading, error, refresh, createMilestone, deleteMilestone, deleteMilestones } = useMilestones();
+
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+  const [pendingSingleId, setPendingSingleId] = React.useState<string | null>(null);
+  const [bulkDialogOpen, setBulkDialogOpen] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const toggleSelected = (id: string, next: boolean) => {
+    setSelectedIds((prev) => {
+      const copy = new Set(prev);
+      if (next) copy.add(id);
+      else copy.delete(id);
+      return copy;
+    });
+  };
+
+  const handleSingleDeleteConfirm = async () => {
+    if (!pendingSingleId) return;
+    setIsDeleting(true);
+    try {
+      await deleteMilestone(pendingSingleId);
+      setPendingSingleId(null);
+    } catch {
+      // error handled in hook
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteMilestones(Array.from(selectedIds));
+      setSelectedIds(new Set());
+      setBulkDialogOpen(false);
+    } catch {
+      // error handled in hook
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <AppShell>
       <PageHeader
         title="Milestones"
-        description="Mark the moments that might explain a change in your data."
+        description="Mark the moments that might explain a change in your data. Select milestones to bulk delete."
         actions={<MilestoneForm onSubmit={createMilestone} />}
       />
 
@@ -30,8 +72,35 @@ export default function MilestonesPage() {
       )}
 
       {!isLoading && !error && milestones.length > 0 && (
-        <MilestoneList milestones={milestones} onDelete={deleteMilestone} />
+        <MilestoneList
+          milestones={milestones}
+          onDelete={(id) => setPendingSingleId(id)}
+          selectedIds={selectedIds}
+          onSelectChange={toggleSelected}
+        />
       )}
+
+      <BulkDeleteBar
+        selectedCount={selectedIds.size}
+        onDelete={() => setBulkDialogOpen(true)}
+        onClear={() => setSelectedIds(new Set())}
+      />
+
+      <DeleteScanDialog
+        open={pendingSingleId !== null}
+        onOpenChange={(open) => !open && setPendingSingleId(null)}
+        count={1}
+        isDeleting={isDeleting}
+        onConfirm={handleSingleDeleteConfirm}
+      />
+
+      <DeleteScanDialog
+        open={bulkDialogOpen}
+        onOpenChange={setBulkDialogOpen}
+        count={selectedIds.size}
+        isDeleting={isDeleting}
+        onConfirm={handleBulkDeleteConfirm}
+      />
     </AppShell>
   );
 }

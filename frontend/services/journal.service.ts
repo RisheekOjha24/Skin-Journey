@@ -23,6 +23,9 @@ export const journalService = {
   delete(id: string) {
     return apiRequest<{ deleted: boolean }>(`/api/journal/${id}`, { method: "DELETE" });
   },
+  bulkDelete(ids: string[]) {
+    return apiRequest<{ deleted: boolean; count: number }>("/api/journal", { method: "DELETE", body: { ids } });
+  },
   async list(params: { page?: number; limit?: number } = {}) {
     return apiRequestWithMeta<JournalEntry[]>("/api/journal", { query: params }).then((r) => ({
       entries: r.data,

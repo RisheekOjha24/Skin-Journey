@@ -1,8 +1,16 @@
 import Link from "next/link";
-import { ArrowRight, Leaf, LineChart, NotebookPen, FileText, Camera } from "lucide-react";
+import {
+  ArrowRight,
+  LineChart,
+  NotebookPen,
+  FileText,
+  Camera,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SITE_CONFIG } from "@/config/site.config";
 import { ROUTES } from "@/config/routes.config";
+import Image from "next/image";
+import skinLogo from "@/assets/skin_analysis_icon.png";
 
 const FEATURES = [
   {
@@ -32,10 +40,16 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Leaf className="h-4 w-4" />
+          <div className="size-8 shrink-0 overflow-hidden rounded-full">
+            <Image
+              src={skinLogo}
+              alt="Skin Logo"
+              className="h-full w-full object-contain"
+            />
           </div>
-          <span className="font-display text-lg font-medium">{SITE_CONFIG.name}</span>
+          <span className="font-display text-lg font-medium">
+            {SITE_CONFIG.name}
+          </span>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="ghost" asChild>
@@ -55,7 +69,8 @@ export default function LandingPage() {
           {SITE_CONFIG.tagline}
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-          {SITE_CONFIG.description} No forecasts, no marketing claims — just your measurements, over time.
+          {SITE_CONFIG.description} No forecasts, no marketing claims — just
+          your measurements, over time.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button size="lg" asChild className="gap-2">
@@ -76,7 +91,9 @@ export default function LandingPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-primary">
                 <f.icon className="h-5 w-5" />
               </div>
-              <h3 className="mt-4 font-display text-lg font-medium">{f.title}</h3>
+              <h3 className="mt-4 font-display text-lg font-medium">
+                {f.title}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">{f.body}</p>
             </div>
           ))}

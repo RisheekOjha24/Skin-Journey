@@ -40,5 +40,10 @@ export function useMilestones() {
     setMilestones((prev) => prev.filter((m) => m.id !== id));
   }, []);
 
-  return { milestones, isLoading, error, refresh: load, createMilestone, deleteMilestone };
+  const deleteMilestones = React.useCallback(async (ids: string[]) => {
+    await milestoneService.bulkDelete(ids);
+    setMilestones((prev) => prev.filter((m) => !ids.includes(m.id)));
+  }, []);
+
+  return { milestones, isLoading, error, refresh: load, createMilestone, deleteMilestone, deleteMilestones };
 }
