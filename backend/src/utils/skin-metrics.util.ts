@@ -29,12 +29,10 @@ export function compareMetrics(before: MetricsMap, after: MetricsMap): MetricCom
     }
 
     const delta = Number((afterVal - beforeVal).toFixed(1));
-    const higherIsBetter = SKIN_METRIC_DIRECTION[metric] === "higherIsBetter";
 
     let direction: MetricComparison["direction"] = "unchanged";
     if (delta !== 0) {
-      const wentUp = delta > 0;
-      direction = (higherIsBetter && wentUp) || (!higherIsBetter && !wentUp) ? "improved" : "regressed";
+      direction = delta > 0 ? "improved" : "regressed";
     }
 
     return { metric, before: beforeVal, after: afterVal, delta, direction };
@@ -42,10 +40,8 @@ export function compareMetrics(before: MetricsMap, after: MetricsMap): MetricCom
 }
 
 /**
- * Overall score is a simple, transparent average of every metric that
- * direction-normalizes each one to a 0-100 "healthier is higher" scale.
- * No AI, no weighting hidden from the user — just arithmetic on real
- * measured values, documented here in one place.
+ * Overall score is a simple, transparent average of every metric.
+ * Uses API scores directly (where higher is better).
  */
 export function computeOverallScore(metrics: MetricsMap): number | null {
   const values: number[] = [];
@@ -53,10 +49,7 @@ export function computeOverallScore(metrics: MetricsMap): number | null {
   for (const metric of SKIN_METRICS) {
     const raw = metrics[metric];
     if (raw === undefined || raw === null) continue;
-
-    const higherIsBetter = SKIN_METRIC_DIRECTION[metric] === "higherIsBetter";
-    const normalized = higherIsBetter ? raw : 100 - raw;
-    values.push(normalized);
+    values.push(raw);
   }
 
   if (values.length === 0) return null;

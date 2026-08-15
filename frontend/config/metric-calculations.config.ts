@@ -6,33 +6,33 @@ export interface MetricDescription {
 
 export const METRIC_DESCRIPTIONS: Record<SkinMetric, MetricDescription> = {
   acne: {
-    description: "Measures visible inflammatory lesions, papules, and spots.",
+    description: "A higher score indicates fewer or less visible acne concerns.",
   },
   redness: {
-    description: "Measures surface skin flushing, irritation, and vascular reactivity.",
+    description: "A higher score indicates less visible redness and skin irritation.",
   },
   pores: {
-    description: "Measures surface pore diameter and visibility across facial zones.",
+    description: "A higher score indicates less visible/enlarged pores.",
   },
   wrinkles: {
-    description: "Measures the depth and density of fine lines and expression wrinkles.",
+    description: "A higher score indicates fewer or less visible wrinkles and fine lines.",
   },
   oiliness: {
-    description: "Measures excess lipid accumulation and surface specular shine.",
+    description: "A higher score indicates better oil balance and controlled surface shine.",
   },
   texture: {
-    description: "Measures micro-surface smoothness and epidermal skin uniformity.",
+    description: "A higher score indicates smoother, more uniform skin texture.",
   },
   darkCircles: {
-    description: "Measures infraorbital pigmentation and vascular shadows under the eyes.",
+    description: "A higher score indicates less visible dark circles under the eyes.",
   },
   darkSpots: {
-    description: "Measures localized melanin density, sun spots, and hyperpigmentation.",
+    description: "A higher score indicates fewer or less visible dark spots and hyperpigmentation.",
   },
   radiance: {
-    description: "Measures skin translucency, overall clarity, and natural glow.",
+    description: "A higher score indicates higher skin radiance, clarity, and glow.",
   },
   moisture: {
-    description: "Measures epidermal hydration levels and moisture barrier health.",
+    description: "A higher score indicates optimal skin hydration and moisture levels.",
   },
 };

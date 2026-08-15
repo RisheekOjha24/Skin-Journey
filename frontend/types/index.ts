@@ -23,6 +23,7 @@ export interface Scan {
   imageUrl: string;
   overlayImageUrl: string | null;
   overallScore: number | null;
+  skinAge?: number | null;
   metrics: MetricsMap;
   capturedAt: string;
   createdAt: string;

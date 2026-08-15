@@ -28,7 +28,11 @@ export default function ScanDetailPage({ params }: { params: { id: string } }) {
       const result = await scanService.getById(params.id);
       setScan(result);
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "Could not load this scan.");
+      setError(
+        err instanceof ApiClientError
+          ? err.message
+          : "Could not load this scan.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +44,10 @@ export default function ScanDetailPage({ params }: { params: { id: string } }) {
 
   return (
     <AppShell>
-      <PageHeader title="Scan Detail" description="Full breakdown from this scan's YouCam analysis." />
+      <PageHeader
+        title="Scan Detail"
+        description="Full breakdown from this scan's YouCam analysis."
+      />
 
       {isLoading && <Skeleton className="h-96 rounded-card" />}
       {!isLoading && error && <ErrorState message={error} onRetry={load} />}
@@ -48,21 +55,51 @@ export default function ScanDetailPage({ params }: { params: { id: string } }) {
       {!isLoading && scan && (
         <div className="grid gap-6 md:grid-cols-[1fr_1.3fr]">
           <Card className="overflow-hidden">
-            <img src={`${API_CONFIG.baseUrl}${scan.imageUrl}`} alt="Scan" className="aspect-square w-full object-cover" />
+            <img
+              src={`${API_CONFIG.baseUrl}${scan.imageUrl}`}
+              alt="Scan"
+              className="aspect-square w-full object-cover"
+            />
           </Card>
           <div className="space-y-6">
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <Badge variant="secondary">{SCAN_TYPE_LABELS[scan.scanType]}</Badge>
-                  <p className="mt-2 text-sm text-muted-foreground">{format(parseUTCDate(scan.capturedAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}</p>
+                  <Badge variant="secondary">
+                    {SCAN_TYPE_LABELS[scan.scanType]}
+                  </Badge>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {format(
+                      parseUTCDate(scan.capturedAt),
+                      "EEEE, MMMM d, yyyy 'at' h:mm a",
+                    )}
+                  </p>
                 </div>
-                <div className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Overall score</p>
-                    <MetricInfoTooltip type="overall" />
+                <div className="flex items-center gap-8 border-l border-border/60 pl-6">
+                  {scan.skinAge !== undefined && scan.skinAge !== null && (
+                    <div className="text-left space-y-0.5">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Skin Age
+                      </p>
+                      <p className="font-display text-3xl font-semibold text-primary">
+                        {scan.skinAge}{" "}
+                        <span className="text-xs font-normal text-muted-foreground">
+                          years
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                  <div className="text-right space-y-0.5">
+                    <div className="flex items-center justify-end gap-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Overall Score
+                      </p>
+                      <MetricInfoTooltip type="overall" />
+                    </div>
+                    <p className="font-display text-3xl font-semibold text-foreground">
+                      {scan.overallScore ?? "—"}
+                    </p>
                   </div>
-                  <p className="font-display text-4xl font-medium">{scan.overallScore ?? "—"}</p>
                 </div>
               </CardContent>
             </Card>

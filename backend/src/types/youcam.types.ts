@@ -9,6 +9,7 @@ import { SkinMetric } from "../config/constants";
  */
 export interface NormalizedSkinAnalysis {
   metrics: Partial<Record<SkinMetric, number>>;
+  skinAge?: number | null;
   overlayImageUrl: string | null;
   rawResponse: unknown;
 }

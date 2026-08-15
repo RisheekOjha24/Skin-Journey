@@ -14,8 +14,8 @@ export const SCAN_TYPE_LABELS: Record<ScanType, string> = {
 
 export const SCAN_CAPTURE_TIPS = [
   "Use the same room and light source every time — natural daylight near a window works best.",
-  "Hold the camera at arm's length, straight on, at the same distance each time.",
-  "Remove makeup and keep a neutral expression for consistent, comparable results.",
+  "Hold the camera at arm's length, straight on, and at the same distance each time.",
+  "Remove makeup and spectacles, and keep a neutral expression for consistent, comparable results.",
   "Scan on the same day each week so your trend line reflects real change, not routine drift.",
 ] as const;
 

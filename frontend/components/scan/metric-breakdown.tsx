@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Progress } from "@/components/ui/progress";
 import { MetricsMap } from "@/types";
-import { SKIN_METRICS, SKIN_METRIC_LABELS, SKIN_METRIC_ICONS, SKIN_METRIC_DIRECTION } from "@/config/metrics.config";
+import { SKIN_METRICS, SKIN_METRIC_LABELS, SKIN_METRIC_ICONS } from "@/config/metrics.config";
 import { MetricInfoTooltip } from "./metric-calculation-info";
 
 export function MetricBreakdown({ metrics }: { metrics: MetricsMap }) {
@@ -10,7 +10,6 @@ export function MetricBreakdown({ metrics }: { metrics: MetricsMap }) {
       {SKIN_METRICS.map((metric) => {
         const value = metrics[metric];
         if (value === undefined) return null;
-        const direction = SKIN_METRIC_DIRECTION[metric];
         const IconComponent = SKIN_METRIC_ICONS[metric];
 
         return (
@@ -24,9 +23,6 @@ export function MetricBreakdown({ metrics }: { metrics: MetricsMap }) {
               <span className="font-mono text-muted-foreground">{value}</span>
             </div>
             <Progress value={value} />
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              {direction === "higherIsBetter" ? "Higher is healthier" : "Lower is healthier"}
-            </p>
           </div>
         );
       })}

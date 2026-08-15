@@ -19,6 +19,20 @@ function normalizeUtcIsoString(dateStr: string): string {
   return s;
 }
 
+function extractSkinAgeFromRawResponse(rawResponseJson: string | null): number | null {
+  if (!rawResponseJson) return null;
+  try {
+    const raw = JSON.parse(rawResponseJson);
+    if (Array.isArray(raw.output)) {
+      const item = raw.output.find((i: any) => i.type === "skin_age");
+      if (item && typeof item.score === "number") return item.score;
+      if (item && typeof item.ui_score === "number") return item.ui_score;
+    }
+    if (typeof raw.skin_age === "number") return raw.skin_age;
+  } catch {}
+  return null;
+}
+
 function toPublicScan(scan: {
   id: string;
   scan_type: string;
@@ -26,6 +40,7 @@ function toPublicScan(scan: {
   overlay_image_path: string | null;
   overall_score: number | null;
   metrics_json: string;
+  raw_response_json: string | null;
   captured_at: string;
   created_at: string;
 }) {
@@ -35,6 +50,7 @@ function toPublicScan(scan: {
     imageUrl: `/uploads/${path.basename(scan.image_path)}`,
     overlayImageUrl: scan.overlay_image_path ? `/uploads/${path.basename(scan.overlay_image_path)}` : null,
     overallScore: scan.overall_score,
+    skinAge: extractSkinAgeFromRawResponse(scan.raw_response_json),
     metrics: JSON.parse(scan.metrics_json) as MetricsMap,
     capturedAt: normalizeUtcIsoString(scan.captured_at),
     createdAt: normalizeUtcIsoString(scan.created_at),

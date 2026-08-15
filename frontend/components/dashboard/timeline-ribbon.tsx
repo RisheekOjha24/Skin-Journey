@@ -89,14 +89,39 @@ export function TimelineRibbon({ scoreHistory, milestones }: TimelineRibbonProps
         <path d={areaPath} fill="url(#ribbonFill)" />
         <path d={path} fill="none" stroke="hsl(var(--primary))" strokeWidth={2.5} strokeLinecap="round" />
 
-        {points.map((p) => (
-          <g key={p.scanId}>
-            <circle cx={p.x} cy={p.y} r={5} fill="hsl(var(--card))" stroke="hsl(var(--primary))" strokeWidth={2.5} />
-            <text x={p.x} y={p.y - 12} textAnchor="middle" className="fill-foreground font-mono" fontSize={10}>
-              {p.score}
-            </text>
-          </g>
-        ))}
+        {points.map((p, idx) => {
+          // Adjust label position to avoid overlap when points are close horizontally
+          const prevP = points[idx - 1];
+          const nextP = points[idx + 1];
+          const isCloseToPrev = prevP && Math.abs(p.x - prevP.x) < 32;
+          const isCloseToNext = nextP && Math.abs(p.x - nextP.x) < 32;
+          
+          let yOffset = -12; // default position above node
+          if (isCloseToPrev || isCloseToNext) {
+            // Alternate label offset or place below node if Y position is high
+            if (idx % 2 === 1) {
+              yOffset = p.y < 35 ? 20 : -22;
+            } else {
+              yOffset = p.y > HEIGHT - 55 ? -14 : 20;
+            }
+          }
+
+          return (
+            <g key={p.scanId}>
+              <circle cx={p.x} cy={p.y} r={5} fill="hsl(var(--card))" stroke="hsl(var(--primary))" strokeWidth={2.5} />
+              <text
+                x={p.x}
+                y={p.y + yOffset}
+                textAnchor="middle"
+                className="fill-foreground font-mono"
+                fontSize={10}
+                fontWeight={500}
+              >
+                {p.score}
+              </text>
+            </g>
+          );
+        })}
 
         {/* Milestone flags along the bottom axis */}
         {milestones.map((m) => {

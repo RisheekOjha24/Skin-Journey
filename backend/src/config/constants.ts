@@ -35,14 +35,14 @@ export const SKIN_METRIC_LABELS: Record<SkinMetric, string> = {
 // Direction matters per metric: for some, a higher API score is healthier;
 // document it centrally so charts/summaries never guess.
 export const SKIN_METRIC_DIRECTION: Record<SkinMetric, "higherIsBetter" | "lowerIsBetter"> = {
-  acne: "lowerIsBetter",
-  redness: "lowerIsBetter",
-  pores: "lowerIsBetter",
-  wrinkles: "lowerIsBetter",
-  oiliness: "lowerIsBetter",
+  acne: "higherIsBetter",
+  redness: "higherIsBetter",
+  pores: "higherIsBetter",
+  wrinkles: "higherIsBetter",
+  oiliness: "higherIsBetter",
   texture: "higherIsBetter",
-  darkCircles: "lowerIsBetter",
-  darkSpots: "lowerIsBetter",
+  darkCircles: "higherIsBetter",
+  darkSpots: "higherIsBetter",
   radiance: "higherIsBetter",
   moisture: "higherIsBetter",
 };

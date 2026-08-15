@@ -5,6 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SCAN_CAPTURE_TIPS, ScanType } from "@/config/scan.config";
 import { cn } from "@/lib/utils";
+import { validateScanImage } from "@/lib/image-validation";
+import { toast } from "sonner";
+
+import sampleImage from "@/assets/sample_image.png";
+import Image from "next/image";
 
 interface ScanCaptureFormProps {
   scanType: ScanType;
@@ -18,9 +23,25 @@ export function ScanCaptureForm({ scanType, isSubmitting, onSubmit }: ScanCaptur
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFile = (selected: File | null) => {
+    if (!selected) {
+      setFile(null);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+      return;
+    }
+
+    const validation = validateScanImage(selected);
+    if (!validation.valid) {
+      toast.error(validation.error);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+      return;
+    }
+
     setFile(selected);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(selected ? URL.createObjectURL(selected) : null);
+    setPreviewUrl(URL.createObjectURL(selected));
   };
 
   React.useEffect(() => {
@@ -40,10 +61,10 @@ export function ScanCaptureForm({ scanType, isSubmitting, onSubmit }: ScanCaptur
               <button
                 type="button"
                 onClick={() => handleFile(null)}
-                className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-ink/60 text-white backdrop-blur-sm hover:bg-ink/80"
+                className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white ring-1 ring-white/20 shadow-md backdrop-blur-md transition-all hover:bg-black hover:scale-105 active:scale-95"
                 aria-label="Remove photo"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 stroke-[2.5]" />
               </button>
             </div>
           ) : (
@@ -56,13 +77,13 @@ export function ScanCaptureForm({ scanType, isSubmitting, onSubmit }: ScanCaptur
             >
               <ImagePlus className="h-10 w-10" />
               <span className="text-sm font-medium">Click to add a photo</span>
-              <span className="text-xs">JPEG, PNG, or WEBP</span>
+              <span className="text-xs">JPG, JPEG, or PNG (max 10 MB)</span>
             </button>
           )}
           <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/png"
             className="hidden"
             onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
           />
@@ -78,19 +99,36 @@ export function ScanCaptureForm({ scanType, isSubmitting, onSubmit }: ScanCaptur
         </CardContent>
       </Card>
 
-      <Card className="bg-accent-soft/40">
-        <CardContent className="p-6">
-          <h3 className="font-display text-base font-medium">For a comparable result</h3>
-          <ul className="mt-3 space-y-3">
-            {SCAN_CAPTURE_TIPS.map((tip) => (
-              <li key={tip} className="flex gap-2.5 text-sm text-muted-foreground">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                {tip}
-              </li>
-            ))}
-          </ul>
+      <Card className="bg-accent-soft/40 flex flex-col justify-between">
+        <CardContent className="p-6 flex flex-col justify-between h-full">
+          <div>
+            <h3 className="font-display text-base font-medium">For a comparable result</h3>
+            <ul className="mt-3 space-y-3">
+              {SCAN_CAPTURE_TIPS.map((tip) => (
+                <li key={tip} className="flex gap-2.5 text-sm text-muted-foreground">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-border/60">
+            <span className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+              Sample Photo Reference
+            </span>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border/60 bg-background/50 shadow-sm">
+              <Image
+                src={sampleImage}
+                alt="Sample scan reference"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 }
+

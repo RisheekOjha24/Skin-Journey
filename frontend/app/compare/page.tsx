@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/routes.config";
 import { CustomSelect } from "@/components/ui/custom-select";
 import { MetricInfoTooltip } from "@/components/scan/metric-calculation-info";
+import { CompareSummary } from "@/components/scan/compare-summary";
 
 export default function ComparePage() {
   const { scans, isLoading: scansLoading } = useScans();
@@ -140,34 +141,35 @@ export default function ComparePage() {
                   className="aspect-square w-full object-cover"
                 />
                 <CardContent className="flex items-center justify-between p-4">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {i === 0 ? "Before" : "After"}
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {i === 0 ? "Before Scan" : "After Scan"}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       {format(parseUTCDate(scan.capturedAt), "MMM d, yyyy · h:mm a")}
                     </p>
                   </div>
-                  <p className="font-display text-2xl font-medium">
-                    {scan.overallScore ?? "—"}
-                  </p>
+                  <div className="flex items-center gap-5 text-right divide-x divide-border/60">
+                    {scan.skinAge !== undefined && scan.skinAge !== null && (
+                      <div className="space-y-0.5 pr-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Skin Age</p>
+                        <p className="font-display text-xl font-semibold text-primary">{scan.skinAge} <span className="text-[10px] font-normal text-muted-foreground">yrs</span></p>
+                      </div>
+                    )}
+                    <div className="space-y-0.5 pl-4">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Score</p>
+                      <p className="font-display text-xl font-semibold text-foreground">
+                        {scan.overallScore ?? "—"}
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
 
           {comparison.overallScoreDelta !== null && (
-            <Card>
-              <CardContent className="flex items-center justify-between p-6">
-                <p className="font-medium">Overall score change</p>
-                <p
-                  className={`font-display text-2xl font-medium ${comparison.overallScoreDelta >= 0 ? "text-positive" : "text-negative"}`}
-                >
-                  {comparison.overallScoreDelta > 0 ? "+" : ""}
-                  {comparison.overallScoreDelta}
-                </p>
-              </CardContent>
-            </Card>
+            <CompareSummary comparison={comparison} />
           )}
 
           <Card>

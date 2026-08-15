@@ -288,6 +288,16 @@ function mapYouCamResultToMetrics(
   ) as Partial<Record<SkinMetric, number>>;
 }
 
+function extractSkinAge(results: Record<string, any>): number | null {
+  if (Array.isArray(results.output)) {
+    const item = results.output.find((i: any) => i.type === "skin_age");
+    if (item && typeof item.score === "number") return item.score;
+    if (item && typeof item.ui_score === "number") return item.ui_score;
+  }
+  if (typeof results.skin_age === "number") return results.skin_age;
+  return null;
+}
+
 async function callLiveApi(imagePath: string): Promise<NormalizedSkinAnalysis> {
   const fileId = await uploadImage(imagePath);
   const taskId = await createSkinAnalysisTask(fileId);
@@ -301,6 +311,7 @@ async function callLiveApi(imagePath: string): Promise<NormalizedSkinAnalysis> {
 
   return {
     metrics: mapYouCamResultToMetrics(results),
+    skinAge: extractSkinAge(results),
     overlayImageUrl:
       (results.url as string) ?? (results.dst_url as string) ?? null,
     rawResponse: results,
@@ -320,12 +331,15 @@ function callMockApi(imagePath: string): NormalizedSkinAnalysis {
     metrics[metric] = value;
   });
 
+  const mockSkinAge = 20 + (parseInt(hash.slice(0, 2), 16) % 25);
+
   logger.info("YouCam mock mode: generated deterministic mock analysis", {
     imagePath,
   });
 
   return {
     metrics,
+    skinAge: mockSkinAge,
     overlayImageUrl: null,
     rawResponse: {
       mock: true,

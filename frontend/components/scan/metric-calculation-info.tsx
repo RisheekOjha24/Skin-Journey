@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Info, HelpCircle } from "lucide-react";
-import { SkinMetric, SKIN_METRIC_LABELS, SKIN_METRIC_DIRECTION } from "@/config/metrics.config";
+import { SkinMetric, SKIN_METRIC_LABELS } from "@/config/metrics.config";
 import { METRIC_DESCRIPTIONS } from "@/config/metric-calculations.config";
 import {
   Popover,
@@ -32,10 +32,10 @@ function InfoContent({ type, metric }: { type: "overall" | "metric"; metric?: Sk
           Overall Score Calculation
         </h4>
         <p className="text-muted-foreground leading-relaxed">
-          Calculated as the simple average of all measured skin metrics, with each metric normalized to a 0–100 scale where higher scores indicate healthier skin.
+          Calculated as the simple average of all measured skin metrics, where higher scores indicate healthier skin.
         </p>
         <div className="rounded-md border border-border bg-muted/50 p-2 font-mono text-[11px] text-foreground">
-          Score = Sum(Normalized Metrics) / Total Metrics
+          Score = Sum(Metric Scores) / Total Metrics
         </div>
       </div>
     );
@@ -45,15 +45,11 @@ function InfoContent({ type, metric }: { type: "overall" | "metric"; metric?: Sk
 
   const desc = METRIC_DESCRIPTIONS[metric];
   const label = SKIN_METRIC_LABELS[metric];
-  const direction = SKIN_METRIC_DIRECTION[metric];
 
   return (
     <div className="space-y-2 text-xs">
       <div className="flex items-center justify-between gap-2">
         <h4 className="font-display text-xs font-semibold text-foreground">{label}</h4>
-        <span className="text-[10px] font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-          {direction === "higherIsBetter" ? "Higher is healthier" : "Lower is healthier"}
-        </span>
       </div>
       <p className="text-muted-foreground leading-relaxed">{desc?.description}</p>
     </div>

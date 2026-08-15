@@ -113,7 +113,6 @@ export function AppSidebar() {
                       {user?.email}
                     </span>
                   </div>
-                  <ChevronsUpDown className="ml-auto h-4 w-4 group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
