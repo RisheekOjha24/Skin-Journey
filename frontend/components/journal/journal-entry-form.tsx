@@ -5,9 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { JOURNAL_FIELD_LABELS, JOURNAL_PLACEHOLDERS } from "@/config/journal.config";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  JOURNAL_FIELD_LABELS,
+  JOURNAL_PLACEHOLDERS,
+} from "@/config/journal.config";
 import { JournalEntryInput } from "@/services/journal.service";
+import { ApiClientError } from "@/lib/api-client";
 import { Plus } from "lucide-react";
 
 interface JournalEntryFormProps {
@@ -24,6 +35,10 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
   const [waterIntake, setWaterIntake] = React.useState("");
   const [dietNotes, setDietNotes] = React.useState("");
   const [notes, setNotes] = React.useState("");
+  const [fieldErrors, setFieldErrors] = React.useState<
+    Record<string, string | null>
+  >({});
+  const [formError, setFormError] = React.useState<string | null>(null);
 
   const reset = () => {
     setProductsUsed("");
@@ -33,10 +48,14 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
     setWaterIntake("");
     setDietNotes("");
     setNotes("");
+    setFieldErrors({});
+    setFormError(null);
   };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setFieldErrors({});
+    setFormError(null);
     try {
       await onSubmit({
         productsUsed: productsUsed
@@ -52,6 +71,37 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
       });
       reset();
       setOpen(false);
+    } catch (err) {
+      if (
+        err instanceof ApiClientError &&
+        err.code === "VALIDATION_ERROR" &&
+        err.details
+      ) {
+        const details = err.details as Record<string, any>;
+        if (
+          details?.body &&
+          typeof details.body === "object" &&
+          !Array.isArray(details.body)
+        ) {
+          const mapped: Record<string, string | null> = {};
+          Object.entries(details.body).forEach(([key, val]) => {
+            if (Array.isArray(val)) mapped[key] = val.join(" ");
+            else if (typeof val === "string") mapped[key] = val;
+            else mapped[key] = null;
+          });
+          setFieldErrors(mapped);
+        } else if (details?.body && Array.isArray(details.body)) {
+          setFormError(details.body.join(" "));
+        } else if (Array.isArray(err.details)) {
+          setFormError(err.details.join(" "));
+        } else {
+          setFormError(err.message);
+        }
+      } else {
+        setFormError(
+          err instanceof Error ? err.message : "Failed to save entry",
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -70,7 +120,9 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="productsUsed">{JOURNAL_FIELD_LABELS.productsUsed}</Label>
+            <Label htmlFor="productsUsed">
+              {JOURNAL_FIELD_LABELS.productsUsed}
+            </Label>
             <Input
               id="productsUsed"
               value={productsUsed}
@@ -81,7 +133,9 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="sleepHours">{JOURNAL_FIELD_LABELS.sleepHours}</Label>
+              <Label htmlFor="sleepHours">
+                {JOURNAL_FIELD_LABELS.sleepHours}
+              </Label>
               <Input
                 id="sleepHours"
                 type="number"
@@ -89,25 +143,45 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
                 min={0}
                 max={24}
                 value={sleepHours}
-                onChange={(e) => setSleepHours(e.target.value)}
+                onChange={(e) => {
+                  setSleepHours(e.target.value);
+                  setFieldErrors((f) => ({ ...f, sleepHours: null }));
+                }}
                 className="mt-1.5"
               />
+              {fieldErrors.sleepHours && (
+                <p className="mt-1 text-sm text-destructive">
+                  {fieldErrors.sleepHours}
+                </p>
+              )}
             </div>
             <div>
-              <Label htmlFor="waterIntake">{JOURNAL_FIELD_LABELS.waterIntakeLiters}</Label>
+              <Label htmlFor="waterIntake">
+                {JOURNAL_FIELD_LABELS.waterIntakeLiters}
+              </Label>
               <Input
                 id="waterIntake"
                 type="number"
                 step="0.1"
                 min={0}
                 value={waterIntake}
-                onChange={(e) => setWaterIntake(e.target.value)}
+                onChange={(e) => {
+                  setWaterIntake(e.target.value);
+                  setFieldErrors((f) => ({ ...f, waterIntakeLiters: null }));
+                }}
                 className="mt-1.5"
               />
+              {fieldErrors.waterIntakeLiters && (
+                <p className="mt-1 text-sm text-destructive">
+                  {fieldErrors.waterIntakeLiters}
+                </p>
+              )}
             </div>
           </div>
           <div>
-            <Label htmlFor="routineMorning">{JOURNAL_FIELD_LABELS.routineMorning}</Label>
+            <Label htmlFor="routineMorning">
+              {JOURNAL_FIELD_LABELS.routineMorning}
+            </Label>
             <Textarea
               id="routineMorning"
               value={routineMorning}
@@ -117,7 +191,9 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
             />
           </div>
           <div>
-            <Label htmlFor="routineEvening">{JOURNAL_FIELD_LABELS.routineEvening}</Label>
+            <Label htmlFor="routineEvening">
+              {JOURNAL_FIELD_LABELS.routineEvening}
+            </Label>
             <Textarea
               id="routineEvening"
               value={routineEvening}
@@ -141,7 +217,11 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting} className="gap-2">
+          <Button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="gap-2"
+          >
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
             Save entry
           </Button>
