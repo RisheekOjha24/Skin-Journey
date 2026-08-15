@@ -15,11 +15,12 @@ import { ScanComparison } from "@/types";
 import { ApiClientError } from "@/lib/api-client";
 import { API_CONFIG } from "@/config/api.config";
 import { SKIN_METRIC_LABELS, SKIN_METRIC_ICONS, SkinMetric } from "@/config/metrics.config";
-import { GitCompareArrows } from "lucide-react";
+import { GitCompareArrows, ArrowRight } from "lucide-react";
 import { parseUTCDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/routes.config";
 import { CustomSelect } from "@/components/ui/custom-select";
+import { MetricInfoTooltip } from "@/components/scan/metric-calculation-info";
 
 export default function ComparePage() {
   const { scans, isLoading: scansLoading } = useScans();
@@ -170,36 +171,66 @@ export default function ComparePage() {
           )}
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Metric-by-metric</CardTitle>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-semibold tracking-tight">Metric Breakdown & Analysis</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Detailed comparison between scans across all key skin parameters
+                  </p>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {comparison.metricComparison.map((c) => {
-                const MetricIcon = SKIN_METRIC_ICONS[c.metric as SkinMetric];
-                return (
-                  <div
-                    key={c.metric}
-                    className="flex items-center justify-between border-b border-border pb-3 last:border-0 last:pb-0"
-                  >
-                    <div className="flex items-center gap-3">
-                      {MetricIcon && (
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                          <MetricIcon className="h-4 w-4" />
+            <CardContent>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {comparison.metricComparison.map((c) => {
+                  const MetricIcon = SKIN_METRIC_ICONS[c.metric as SkinMetric];
+                  const beforeVal = c.before ?? "—";
+                  const afterVal = c.after ?? "—";
+
+                  return (
+                    <div
+                      key={c.metric}
+                      className="group flex flex-col justify-between rounded-xl border border-border/70 bg-card/60 p-4 transition-all duration-200 hover:border-border hover:bg-card hover:shadow-sm"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-2.5">
+                          {MetricIcon && (
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                              <MetricIcon className="h-4.5 w-4.5" />
+                            </div>
+                          )}
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-display text-base font-semibold text-foreground">
+                                {SKIN_METRIC_LABELS[c.metric as SkinMetric]}
+                              </span>
+                              <MetricInfoTooltip type="metric" metric={c.metric as SkinMetric} />
+                            </div>
+                          </div>
                         </div>
-                      )}
-                      <div>
-                        <p className="text-sm font-medium">
-                          {SKIN_METRIC_LABELS[c.metric as SkinMetric]}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {c.before ?? "—"} → {c.after ?? "—"}
-                        </p>
+                        <MetricDeltaBadge comparison={c} />
+                      </div>
+
+                      <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3.5 py-2 mt-1">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Before</span>
+                          <span className="font-mono text-base font-medium text-foreground">{beforeVal}</span>
+                        </div>
+
+                        <div className="flex items-center px-2 text-primary/80">
+                          <ArrowRight className="h-6 w-6 stroke-[2.5]" />
+                        </div>
+
+                        <div className="flex flex-col text-right">
+                          <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">After</span>
+                          <span className="font-mono text-base font-semibold text-foreground">{afterVal}</span>
+                        </div>
                       </div>
                     </div>
-                    <MetricDeltaBadge comparison={c} />
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
         </div>

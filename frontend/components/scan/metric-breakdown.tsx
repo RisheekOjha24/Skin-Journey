@@ -2,6 +2,7 @@ import * as React from "react";
 import { Progress } from "@/components/ui/progress";
 import { MetricsMap } from "@/types";
 import { SKIN_METRICS, SKIN_METRIC_LABELS, SKIN_METRIC_ICONS, SKIN_METRIC_DIRECTION } from "@/config/metrics.config";
+import { MetricInfoTooltip } from "./metric-calculation-info";
 
 export function MetricBreakdown({ metrics }: { metrics: MetricsMap }) {
   return (
@@ -18,6 +19,7 @@ export function MetricBreakdown({ metrics }: { metrics: MetricsMap }) {
               <span className="flex items-center gap-1.5 font-medium">
                 {IconComponent && <IconComponent className="h-4 w-4 text-primary shrink-0" />}
                 {SKIN_METRIC_LABELS[metric]}
+                <MetricInfoTooltip type="metric" metric={metric} />
               </span>
               <span className="font-mono text-muted-foreground">{value}</span>
             </div>

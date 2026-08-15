@@ -7,13 +7,21 @@ import path from "node:path";
 import { env } from "./config/env";
 import { RATE_LIMIT } from "./config/constants";
 import routes from "./routes";
-import { errorHandlerMiddleware, notFoundMiddleware } from "./middleware/error-handler.middleware";
+import {
+  errorHandlerMiddleware,
+  notFoundMiddleware,
+} from "./middleware/error-handler.middleware";
 
 export function createApp(): Express {
   const app = express();
 
   app.use(helmet({ crossOriginResourcePolicy: false }));
-  app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+  app.use(
+    cors({
+      origin: ["http://localhost:3000", "http://192.168.8.133:3000"],
+      credentials: true,
+    }),
+  );
   app.use(express.json({ limit: "2mb" }));
   app.use(express.urlencoded({ extended: true }));
 

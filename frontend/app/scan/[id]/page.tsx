@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MetricBreakdown } from "@/components/scan/metric-breakdown";
+import { MetricInfoTooltip } from "@/components/scan/metric-calculation-info";
 import { scanService } from "@/services/scan.service";
 import { Scan } from "@/types";
 import { ApiClientError } from "@/lib/api-client";
@@ -57,7 +58,10 @@ export default function ScanDetailPage({ params }: { params: { id: string } }) {
                   <p className="mt-2 text-sm text-muted-foreground">{format(parseUTCDate(scan.capturedAt), "EEEE, MMMM d, yyyy 'at' h:mm a")}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Overall score</p>
+                  <div className="flex items-center justify-end gap-1">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Overall score</p>
+                    <MetricInfoTooltip type="overall" />
+                  </div>
                   <p className="font-display text-4xl font-medium">{scan.overallScore ?? "—"}</p>
                 </div>
               </CardContent>
