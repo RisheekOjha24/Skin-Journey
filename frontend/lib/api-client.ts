@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { httpClient } from "./http-client";
 import { MESSAGES } from "../config/messages.config";
 import { ApiErrorShape, ApiSuccessShape } from "../types";
@@ -8,7 +8,12 @@ export class ApiClientError extends Error {
   public readonly status: number;
   public readonly details?: unknown;
 
-  constructor(message: string, code: string, status: number, details?: unknown) {
+  constructor(
+    message: string,
+    code: string,
+    status: number,
+    details?: unknown,
+  ) {
     super(message);
     this.name = "ApiClientError";
     this.code = code;
@@ -42,32 +47,26 @@ function normalizeError(error: unknown): ApiClientError {
       payload?.error?.message || MESSAGES.errors.generic,
       payload?.error?.code || "UNKNOWN_ERROR",
       axiosError.response.status,
-      payload?.error?.details
+      payload?.error?.details,
     );
   }
 
   return new ApiClientError(MESSAGES.errors.generic, "UNKNOWN_ERROR", 0);
 }
 
-interface RequestOptions {
-  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+export interface RequestOptions {
+  method?: AxiosRequestConfig["method"];
   body?: unknown;
-  /**
-   * @deprecated no longer required — FormData bodies are now detected
-   * automatically so Axios (and the browser) can set the correct
-   * multipart boundary. Kept only so existing call sites compile
-   * unchanged; safe to omit in new code.
-   */
+  query?: Record<string, unknown>;
   isFormData?: boolean;
-  query?: Record<string, string | number | undefined>;
+  timeout?: number;
 }
-
 /** Same as apiRequest but also returns the `meta` block (used for pagination). */
 export async function apiRequestWithMeta<T>(
   path: string,
-  options: RequestOptions = {}
+  options: RequestOptions = {},
 ): Promise<{ data: T; meta?: Record<string, unknown> }> {
-  const { method = "GET", body, query } = options;
+  const { method = "GET", body, query, timeout } = options;
 
   try {
     const response = await httpClient.request<ApiSuccessShape<T>>({
@@ -75,6 +74,7 @@ export async function apiRequestWithMeta<T>(
       method,
       data: body,
       params: query,
+      timeout,
     });
 
     return { data: response.data.data, meta: response.data.meta };
@@ -89,7 +89,10 @@ export async function apiRequestWithMeta<T>(
  * JSON handling, and error normalization so components never touch
  * `axios`/`fetch` directly.
  */
-export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+export async function apiRequest<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { data } = await apiRequestWithMeta<T>(path, options);
   return data;
 }
@@ -114,7 +117,7 @@ export async function apiDownload(path: string): Promise<Blob> {
           parsed.error?.message || MESSAGES.errors.generic,
           parsed.error?.code || "UNKNOWN_ERROR",
           error.response.status,
-          parsed.error?.details
+          parsed.error?.details,
         );
       } catch (parseError) {
         if (parseError instanceof ApiClientError) throw parseError;

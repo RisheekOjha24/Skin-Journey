@@ -7,14 +7,21 @@ export const scanService = {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("scanType", scanType);
-    return apiRequest<Scan>("/api/scans", { method: "POST", body: formData, isFormData: true });
+    return apiRequest<Scan>("/api/scans", {
+      method: "POST",
+      body: formData,
+      isFormData: true,
+      timeout: 120_000, // 2 minutes
+    });
   },
 
   async list(params: { page?: number; limit?: number } = {}) {
-    return apiRequestWithMeta<Scan[]>("/api/scans", { query: params }).then((r) => ({
-      scans: r.data,
-      pagination: r.meta?.pagination as Pagination | undefined,
-    }));
+    return apiRequestWithMeta<Scan[]>("/api/scans", { query: params }).then(
+      (r) => ({
+        scans: r.data,
+        pagination: r.meta?.pagination as Pagination | undefined,
+      }),
+    );
   },
 
   getById(id: string) {
@@ -22,7 +29,9 @@ export const scanService = {
   },
 
   compare(beforeId: string, afterId: string) {
-    return apiRequest<ScanComparison>("/api/scans/compare", { query: { beforeId, afterId } });
+    return apiRequest<ScanComparison>("/api/scans/compare", {
+      query: { beforeId, afterId },
+    });
   },
 
   dashboard() {
@@ -30,13 +39,18 @@ export const scanService = {
   },
 
   delete(id: string) {
-    return apiRequest<{ id: string; deleted: boolean }>(`/api/scans/${id}`, { method: "DELETE" });
+    return apiRequest<{ id: string; deleted: boolean }>(`/api/scans/${id}`, {
+      method: "DELETE",
+    });
   },
 
   deleteMany(ids: string[]) {
-    return apiRequest<{ deletedIds: string[]; deletedCount: number }>("/api/scans", {
-      method: "DELETE",
-      body: { ids },
-    });
+    return apiRequest<{ deletedIds: string[]; deletedCount: number }>(
+      "/api/scans",
+      {
+        method: "DELETE",
+        body: { ids },
+      },
+    );
   },
 };

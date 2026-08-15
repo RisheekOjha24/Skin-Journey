@@ -221,6 +221,18 @@ async function pollSkinAnalysisTask(
         error: taskData.error,
         errorMessage: taskData.error_message,
       });
+      if (taskData.error === "error_src_face_too_small") {
+        throw ApiError.externalApi(
+          "Please upload a close-up photo where your face fills more of the frame.",
+        );
+      }
+
+      if (taskData.error === "error_below_min_image_size") {
+        throw ApiError.externalApi(
+          "Please upload a higher-resolution, close-up face image. Ensure the face occupies at least 80% of the image width for accurate skin analysis.",
+        );
+      }
+
       throw ApiError.externalApi(
         taskData.error_message ||
           "The skin analysis engine could not process this photo.",

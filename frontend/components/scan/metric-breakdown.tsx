@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Progress } from "@/components/ui/progress";
 import { MetricsMap } from "@/types";
-import { SKIN_METRICS, SKIN_METRIC_LABELS, SKIN_METRIC_DIRECTION } from "@/config/metrics.config";
+import { SKIN_METRICS, SKIN_METRIC_LABELS, SKIN_METRIC_ICONS, SKIN_METRIC_DIRECTION } from "@/config/metrics.config";
 
 export function MetricBreakdown({ metrics }: { metrics: MetricsMap }) {
   return (
@@ -10,11 +10,15 @@ export function MetricBreakdown({ metrics }: { metrics: MetricsMap }) {
         const value = metrics[metric];
         if (value === undefined) return null;
         const direction = SKIN_METRIC_DIRECTION[metric];
+        const IconComponent = SKIN_METRIC_ICONS[metric];
 
         return (
           <div key={metric}>
             <div className="mb-1.5 flex items-center justify-between text-sm">
-              <span className="font-medium">{SKIN_METRIC_LABELS[metric]}</span>
+              <span className="flex items-center gap-1.5 font-medium">
+                {IconComponent && <IconComponent className="h-4 w-4 text-primary shrink-0" />}
+                {SKIN_METRIC_LABELS[metric]}
+              </span>
               <span className="font-mono text-muted-foreground">{value}</span>
             </div>
             <Progress value={value} />

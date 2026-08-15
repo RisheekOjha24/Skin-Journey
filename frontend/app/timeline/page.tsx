@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScoreTimelineChart } from "@/components/charts/score-timeline-chart";
 import { MetricTrendChart } from "@/components/charts/metric-trend-chart";
 import { useDashboard } from "@/hooks/use-dashboard";
-import { SKIN_METRICS, SKIN_METRIC_LABELS, SkinMetric } from "@/config/metrics.config";
+import { SKIN_METRICS, SKIN_METRIC_LABELS, SKIN_METRIC_ICONS, SkinMetric } from "@/config/metrics.config";
 import { MESSAGES } from "@/config/messages.config";
 import { LineChart } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -51,10 +51,14 @@ export default function TimelinePage() {
             {SKIN_METRICS.map((metric) => {
               const series = data.metricSeries[metric];
               if (!series || series.length === 0) return null;
+              const IconComponent = SKIN_METRIC_ICONS[metric];
               return (
                 <Card key={metric}>
                   <CardHeader>
-                    <CardTitle className="text-sm">{SKIN_METRIC_LABELS[metric as SkinMetric]}</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-sm">
+                      {IconComponent && <IconComponent className="h-4 w-4 text-primary shrink-0" />}
+                      {SKIN_METRIC_LABELS[metric as SkinMetric]}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <MetricTrendChart metric={metric as SkinMetric} data={series} />

@@ -1,4 +1,9 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResponse } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
 import { API_CONFIG } from "@/config/api.config";
 
 /**
@@ -44,11 +49,12 @@ httpClient.interceptors.request.use((config: RequestConfigWithMetadata) => {
   config.metadata = { startedAt: Date.now() };
 
   if (process.env.NODE_ENV === "development") {
-    const isFormData = typeof FormData !== "undefined" && config.data instanceof FormData;
+    const isFormData =
+      typeof FormData !== "undefined" && config.data instanceof FormData;
     // eslint-disable-next-line no-console
     console.debug(
       `[api →] ${config.method?.toUpperCase()} ${config.url}`,
-      isFormData ? "[FormData]" : config.data ?? ""
+      isFormData ? "[FormData]" : (config.data ?? ""),
     );
   }
 
@@ -58,12 +64,13 @@ httpClient.interceptors.request.use((config: RequestConfigWithMetadata) => {
 httpClient.interceptors.response.use(
   (response: AxiosResponse) => {
     if (process.env.NODE_ENV === "development") {
-      const startedAt = (response.config as RequestConfigWithMetadata).metadata?.startedAt;
+      const startedAt = (response.config as RequestConfigWithMetadata).metadata
+        ?.startedAt;
       const durationMs = startedAt ? Date.now() - startedAt : undefined;
       // eslint-disable-next-line no-console
       console.debug(
         `[api ←] ${response.status} ${response.config.url}${durationMs ? ` (${durationMs}ms)` : ""}`,
-        response.data
+        response.data,
       );
     }
     return response;
@@ -78,12 +85,12 @@ httpClient.interceptors.response.use(
         `[api ✕] ${error.response?.status ?? error.code ?? "ERR"} ${config?.url}${
           durationMs ? ` (${durationMs}ms)` : ""
         }`,
-        error.response?.data ?? error.message
+        error.response?.data ?? error.message,
       );
     }
     // Re-thrown as-is; lib/api-client.ts is the single place that
     // normalizes this into an ApiClientError, so every caller gets the
     // same shape without each service duplicating error classification.
     return Promise.reject(error);
-  }
+  },
 );

@@ -1,3 +1,17 @@
+import {
+  Sparkles,
+  Droplet,
+  CircleDot,
+  Grid3X3,
+  Target,
+  Waves,
+  Flame,
+  Droplets,
+  Eye,
+  Focus,
+  type LucideIcon,
+} from "lucide-react";
+
 export const SKIN_METRICS = [
   "acne",
   "redness",
@@ -24,6 +38,19 @@ export const SKIN_METRIC_LABELS: Record<SkinMetric, string> = {
   darkSpots: "Dark Spots",
   radiance: "Radiance",
   moisture: "Moisture",
+};
+
+export const SKIN_METRIC_ICONS: Record<SkinMetric, LucideIcon> = {
+  acne: Target,
+  redness: Flame,
+  pores: CircleDot,
+  wrinkles: Waves,
+  oiliness: Droplets,
+  texture: Grid3X3,
+  darkCircles: Eye,
+  darkSpots: Focus,
+  radiance: Sparkles,
+  moisture: Droplet,
 };
 
 export const SKIN_METRIC_DIRECTION: Record<SkinMetric, "higherIsBetter" | "lowerIsBetter"> = {
