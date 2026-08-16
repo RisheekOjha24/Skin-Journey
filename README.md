@@ -135,4 +135,4 @@ To switch to live API scoring:
 
 ## 📄 License
 
-Built for the YouCam API Skin AI Track.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
