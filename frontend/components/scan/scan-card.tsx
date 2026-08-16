@@ -29,7 +29,7 @@ export function ScanCard({ scan, selected = false, onSelectChange, onDeleteReque
             checked={selected}
             onCheckedChange={(v) => onSelectChange(Boolean(v))}
             onClick={(e) => e.stopPropagation()}
-            className="h-5 w-5 border-white bg-card/90 shadow-soft data-[state=checked]:bg-primary"
+            className="h-5 w-5 border border-slate-700/80 bg-background shadow-md data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
             aria-label="Select scan"
           />
         </div>
