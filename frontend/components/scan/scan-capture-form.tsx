@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { validateScanImage } from "@/lib/image-validation";
 import { toast } from "sonner";
 
+import { ScanImageViewer } from "@/components/scan/scan-image-viewer";
 import sampleImage from "@/assets/sample_image.png";
 import Image from "next/image";
 
@@ -56,17 +57,13 @@ export function ScanCaptureForm({ scanType, isSubmitting, onSubmit }: ScanCaptur
       <Card>
         <CardContent className="p-6">
           {previewUrl ? (
-            <div className="relative">
-              <img src={previewUrl} alt="Scan preview" className="aspect-square w-full rounded-md object-cover" />
-              <button
-                type="button"
-                onClick={() => handleFile(null)}
-                className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white ring-1 ring-white/20 shadow-md backdrop-blur-md transition-all hover:bg-black hover:scale-105 active:scale-95"
-                aria-label="Remove photo"
-              >
-                <X className="h-4 w-4 stroke-[2.5]" />
-              </button>
-            </div>
+            <ScanImageViewer
+              src={previewUrl}
+              alt="Scan preview"
+              allowRemove
+              onRemove={() => handleFile(null)}
+              title="Uploaded Scan Preview"
+            />
           ) : (
             <button
               type="button"

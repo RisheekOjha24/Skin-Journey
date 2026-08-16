@@ -22,6 +22,7 @@ import { ROUTES } from "@/config/routes.config";
 import { CustomSelect } from "@/components/ui/custom-select";
 import { MetricInfoTooltip } from "@/components/scan/metric-calculation-info";
 import { CompareSummary } from "@/components/scan/compare-summary";
+import { ScanImageViewer } from "@/components/scan/scan-image-viewer";
 
 export default function ComparePage() {
   const { scans, isLoading: scansLoading } = useScans();
@@ -135,10 +136,10 @@ export default function ComparePage() {
           <div className="grid gap-6 sm:grid-cols-2">
             {[comparison.before, comparison.after].map((scan, i) => (
               <Card key={scan.id} className="overflow-hidden">
-                <img
+                <ScanImageViewer
                   src={`${API_CONFIG.baseUrl}${scan.imageUrl}`}
-                  alt={i === 0 ? "Before" : "After"}
-                  className="aspect-square w-full object-cover"
+                  alt={i === 0 ? "Before Scan" : "After Scan"}
+                  title={i === 0 ? "Before Scan" : "After Scan"}
                 />
                 <CardContent className="flex items-center justify-between p-4">
                   <div className="space-y-0.5">

@@ -53,11 +53,11 @@ export function ScanCard({ scan, selected = false, onSelectChange, onDeleteReque
       )}
 
       <Link href={ROUTES.scanDetail(scan.id)}>
-        <div className="aspect-square overflow-hidden bg-muted">
+        <div className="aspect-square overflow-hidden bg-muted/40 flex items-center justify-center">
           <img
             src={`${API_CONFIG.baseUrl}${scan.imageUrl}`}
             alt="Skin scan"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
           />
         </div>
         <CardContent className="p-4">

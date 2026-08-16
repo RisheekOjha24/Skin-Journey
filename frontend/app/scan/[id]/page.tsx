@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { MetricBreakdown } from "@/components/scan/metric-breakdown";
 import { MetricInfoTooltip } from "@/components/scan/metric-calculation-info";
 import { scanService } from "@/services/scan.service";
+import { ScanImageViewer } from "@/components/scan/scan-image-viewer";
 import { Scan } from "@/types";
 import { ApiClientError } from "@/lib/api-client";
 import { SCAN_TYPE_LABELS } from "@/config/scan.config";
@@ -54,13 +55,11 @@ export default function ScanDetailPage({ params }: { params: { id: string } }) {
 
       {!isLoading && scan && (
         <div className="grid gap-6 md:grid-cols-[1fr_1.3fr]">
-          <Card className="overflow-hidden">
-            <img
-              src={`${API_CONFIG.baseUrl}${scan.imageUrl}`}
-              alt="Scan"
-              className="aspect-square w-full object-cover"
-            />
-          </Card>
+          <ScanImageViewer
+            src={`${API_CONFIG.baseUrl}${scan.imageUrl}`}
+            alt="Scan Detail"
+            title={`Scan Detail — ${format(parseUTCDate(scan.capturedAt), "MMMM d, yyyy")}`}
+          />
           <div className="space-y-6">
             <Card>
               <CardContent className="flex items-center justify-between p-6">
