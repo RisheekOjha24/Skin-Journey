@@ -58,6 +58,29 @@ async function resolveImageBuffer(imagePathOrUrl: string | null): Promise<Buffer
   }
 }
 
+function formatDateTime(dateInput: string | Date): string {
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return String(dateInput);
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+function formatDateOnly(dateInput: string | Date): string {
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return String(dateInput);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export const pdfService = {
   /**
    * Streams a dermatologist-ready PDF report directly to the response.
@@ -92,7 +115,7 @@ export const pdfService = {
       .fontSize(9)
       .font("Helvetica")
       .fillColor(COLORS.muted)
-      .text(`Prepared for ${user.display_name}  ·  Generated ${new Date().toDateString()}`);
+      .text(`Prepared for ${user.display_name}  ·  Generated ${formatDateTime(new Date())}`);
     doc.moveDown(1);
     doc.strokeColor(COLORS.line).lineWidth(1).moveTo(PAGE_MARGIN, doc.y).lineTo(PAGE_MARGIN + CONTENT_WIDTH, doc.y).stroke();
     doc.moveDown(1);
@@ -105,9 +128,9 @@ export const pdfService = {
       .font("Helvetica")
       .fillColor(COLORS.muted)
       .text(
-        `${scans.length} scan${scans.length === 1 ? "" : "s"} recorded from ${new Date(
+        `${scans.length} scan${scans.length === 1 ? "" : "s"} recorded from ${formatDateTime(
           scans[0].captured_at
-        ).toDateString()} to ${new Date(scans[scans.length - 1].captured_at).toDateString()}.`
+        )} to ${formatDateTime(scans[scans.length - 1].captured_at)}.`
       );
     doc.moveDown(1);
 
@@ -207,7 +230,7 @@ export const pdfService = {
         .fontSize(11)
         .font("Helvetica-Bold")
         .fillColor(COLORS.accent)
-        .text(`Scan ${index + 1} — ${new Date(scan.captured_at).toDateString()}`, textX, imageY, {
+        .text(`Scan ${index + 1} — ${formatDateTime(scan.captured_at)}`, textX, imageY, {
           width: textWidth,
         });
       doc
@@ -239,7 +262,7 @@ export const pdfService = {
           .fontSize(10)
           .font("Helvetica-Bold")
           .fillColor(COLORS.accent)
-          .text(`${new Date(m.occurred_at).toDateString()} — ${m.title}`);
+          .text(`${formatDateTime(m.occurred_at)} — ${m.title}`);
         if (m.description) {
           doc.fontSize(9).font("Helvetica").fillColor(COLORS.muted).text(m.description, { width: CONTENT_WIDTH });
         }
@@ -254,7 +277,7 @@ export const pdfService = {
       doc.moveDown(0.4);
       journalEntries.forEach((entry) => {
         const products = entry.products_used ? JSON.parse(entry.products_used) : [];
-        doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.accent).text(new Date(entry.entry_date).toDateString());
+        doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.accent).text(formatDateOnly(entry.entry_date));
         if (products.length) {
           doc.fontSize(9).font("Helvetica").fillColor(COLORS.muted).text(`Products: ${products.join(", ")}`);
         }

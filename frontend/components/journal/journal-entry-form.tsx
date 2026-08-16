@@ -52,10 +52,67 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
     setFormError(null);
   };
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollToFirstError = (errors: Record<string, string | null>, mainError?: string | null) => {
+    setTimeout(() => {
+      if (mainError && containerRef.current) {
+        containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      const errorFieldKeys = Object.keys(errors).filter((k) => Boolean(errors[k]));
+      if (errorFieldKeys.length === 0) return;
+
+      const firstKey = errorFieldKeys[0];
+      const targetId = firstKey === "waterIntakeLiters" ? "waterIntake" : firstKey;
+      const element = document.getElementById(targetId);
+
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.focus({ preventScroll: true });
+      }
+    }, 50);
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setFieldErrors({});
     setFormError(null);
+
+    const errors: Record<string, string> = {};
+    if (sleepHours !== "") {
+      const num = Number(sleepHours);
+      if (isNaN(num) || num < 0 || num > 24) {
+        errors.sleepHours = "Sleep hours must be between 0 and 24.";
+      }
+    }
+    if (waterIntake !== "") {
+      const num = Number(waterIntake);
+      if (isNaN(num) || num < 0 || num > 20) {
+        errors.waterIntakeLiters = "Water intake must be between 0 and 20 liters.";
+      }
+    }
+    if (routineMorning.length > 2000) {
+      errors.routineMorning = "Morning routine must not exceed 2000 characters.";
+    }
+    if (routineEvening.length > 2000) {
+      errors.routineEvening = "Evening routine must not exceed 2000 characters.";
+    }
+    if (dietNotes.length > 2000) {
+      errors.dietNotes = "Diet notes must not exceed 2000 characters.";
+    }
+    if (notes.length > 4000) {
+      errors.notes = "Notes must not exceed 4000 characters.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      scrollToFirstError(errors);
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       await onSubmit({
         productsUsed: productsUsed
@@ -78,29 +135,26 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
         err.details
       ) {
         const details = err.details as Record<string, any>;
-        if (
-          details?.body &&
-          typeof details.body === "object" &&
-          !Array.isArray(details.body)
-        ) {
-          const mapped: Record<string, string | null> = {};
-          Object.entries(details.body).forEach(([key, val]) => {
+        const mapped: Record<string, string | null> = {};
+
+        const targetObj = details.body || details;
+        if (targetObj && typeof targetObj === "object") {
+          Object.entries(targetObj).forEach(([key, val]) => {
             if (Array.isArray(val)) mapped[key] = val.join(" ");
             else if (typeof val === "string") mapped[key] = val;
-            else mapped[key] = null;
           });
+        }
+        if (Object.keys(mapped).length > 0) {
           setFieldErrors(mapped);
-        } else if (details?.body && Array.isArray(details.body)) {
-          setFormError(details.body.join(" "));
-        } else if (Array.isArray(err.details)) {
-          setFormError(err.details.join(" "));
+          scrollToFirstError(mapped);
         } else {
           setFormError(err.message);
+          scrollToFirstError({}, err.message);
         }
       } else {
-        setFormError(
-          err instanceof Error ? err.message : "Failed to save entry",
-        );
+        const msg = err instanceof Error ? err.message : "Failed to save entry";
+        setFormError(msg);
+        scrollToFirstError({}, msg);
       }
     } finally {
       setIsSubmitting(false);
@@ -114,11 +168,16 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
           <Plus className="h-4 w-4" /> Add entry
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
+      <DialogContent ref={containerRef} className="max-h-[85vh] max-w-lg overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New journal entry</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {formError && (
+            <div className="rounded-md bg-destructive/10 p-3 text-sm font-medium text-destructive">
+              {formError}
+            </div>
+          )}
           <div>
             <Label htmlFor="productsUsed">
               {JOURNAL_FIELD_LABELS.productsUsed}
@@ -126,10 +185,18 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
             <Input
               id="productsUsed"
               value={productsUsed}
-              onChange={(e) => setProductsUsed(e.target.value)}
+              onChange={(e) => {
+                setProductsUsed(e.target.value);
+                setFieldErrors((f) => ({ ...f, productsUsed: null }));
+              }}
               placeholder={JOURNAL_PLACEHOLDERS.productsUsed}
               className="mt-1.5"
             />
+            {fieldErrors.productsUsed && (
+              <p className="mt-1 text-sm text-destructive">
+                {fieldErrors.productsUsed}
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -167,7 +234,7 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
                 value={waterIntake}
                 onChange={(e) => {
                   setWaterIntake(e.target.value);
-                  setFieldErrors((f) => ({ ...f, waterIntakeLiters: null }));
+                  setFieldErrors((f) => ({ ...f, waterIntakeLiters: null, waterIntake: null }));
                 }}
                 className="mt-1.5"
               />
@@ -185,10 +252,18 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
             <Textarea
               id="routineMorning"
               value={routineMorning}
-              onChange={(e) => setRoutineMorning(e.target.value)}
+              onChange={(e) => {
+                setRoutineMorning(e.target.value);
+                setFieldErrors((f) => ({ ...f, routineMorning: null }));
+              }}
               placeholder={JOURNAL_PLACEHOLDERS.routineMorning}
               className="mt-1.5"
             />
+            {fieldErrors.routineMorning && (
+              <p className="mt-1 text-sm text-destructive">
+                {fieldErrors.routineMorning}
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="routineEvening">
@@ -197,20 +272,54 @@ export function JournalEntryForm({ onSubmit }: JournalEntryFormProps) {
             <Textarea
               id="routineEvening"
               value={routineEvening}
-              onChange={(e) => setRoutineEvening(e.target.value)}
+              onChange={(e) => {
+                setRoutineEvening(e.target.value);
+                setFieldErrors((f) => ({ ...f, routineEvening: null }));
+              }}
               placeholder={JOURNAL_PLACEHOLDERS.routineEvening}
               className="mt-1.5"
             />
+            {fieldErrors.routineEvening && (
+              <p className="mt-1 text-sm text-destructive">
+                {fieldErrors.routineEvening}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="dietNotes">{JOURNAL_FIELD_LABELS.dietNotes}</Label>
+            <Textarea
+              id="dietNotes"
+              value={dietNotes}
+              onChange={(e) => {
+                setDietNotes(e.target.value);
+                setFieldErrors((f) => ({ ...f, dietNotes: null }));
+              }}
+              placeholder={JOURNAL_PLACEHOLDERS.dietNotes}
+              className="mt-1.5"
+            />
+            {fieldErrors.dietNotes && (
+              <p className="mt-1 text-sm text-destructive">
+                {fieldErrors.dietNotes}
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="notes">{JOURNAL_FIELD_LABELS.notes}</Label>
             <Textarea
               id="notes"
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={(e) => {
+                setNotes(e.target.value);
+                setFieldErrors((f) => ({ ...f, notes: null }));
+              }}
               placeholder={JOURNAL_PLACEHOLDERS.notes}
               className="mt-1.5"
             />
+            {fieldErrors.notes && (
+              <p className="mt-1 text-sm text-destructive">
+                {fieldErrors.notes}
+              </p>
+            )}
           </div>
         </div>
         <DialogFooter>

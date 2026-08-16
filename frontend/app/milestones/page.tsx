@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MilestoneForm } from "@/components/milestones/milestone-form";
 import { MilestoneList } from "@/components/milestones/milestone-list";
 import { BulkDeleteBar } from "@/components/scan/bulk-delete-bar";
-import { DeleteScanDialog } from "@/components/scan/delete-scan-dialog";
+import { DeleteMilestoneDialog } from "@/components/milestones/delete-milestone-dialog";
 import { useMilestones } from "@/hooks/use-milestones";
 import { MESSAGES } from "@/config/messages.config";
 import { Flag } from "lucide-react";
@@ -35,6 +35,11 @@ export default function MilestonesPage() {
     setIsDeleting(true);
     try {
       await deleteMilestone(pendingSingleId);
+      setSelectedIds((prev) => {
+        const copy = new Set(prev);
+        copy.delete(pendingSingleId);
+        return copy;
+      });
       setPendingSingleId(null);
     } catch {
       // error handled in hook
@@ -82,11 +87,12 @@ export default function MilestonesPage() {
 
       <BulkDeleteBar
         selectedCount={selectedIds.size}
+        itemLabel="milestone"
         onDelete={() => setBulkDialogOpen(true)}
         onClear={() => setSelectedIds(new Set())}
       />
 
-      <DeleteScanDialog
+      <DeleteMilestoneDialog
         open={pendingSingleId !== null}
         onOpenChange={(open) => !open && setPendingSingleId(null)}
         count={1}
@@ -94,7 +100,7 @@ export default function MilestonesPage() {
         onConfirm={handleSingleDeleteConfirm}
       />
 
-      <DeleteScanDialog
+      <DeleteMilestoneDialog
         open={bulkDialogOpen}
         onOpenChange={setBulkDialogOpen}
         count={selectedIds.size}

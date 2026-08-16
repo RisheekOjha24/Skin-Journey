@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { JournalEntryForm } from "@/components/journal/journal-entry-form";
 import { JournalEntryCard } from "@/components/journal/journal-entry-card";
 import { BulkDeleteBar } from "@/components/scan/bulk-delete-bar";
-import { DeleteScanDialog } from "@/components/scan/delete-scan-dialog";
+import { DeleteJournalDialog } from "@/components/journal/delete-journal-dialog";
 import { useJournal } from "@/hooks/use-journal";
 import { MESSAGES } from "@/config/messages.config";
 import { NotebookPen } from "lucide-react";
@@ -35,6 +35,11 @@ export default function JournalPage() {
     setIsDeleting(true);
     try {
       await deleteEntry(pendingSingleId);
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(pendingSingleId);
+        return next;
+      });
       setPendingSingleId(null);
     } catch {
       // error handled in hook
@@ -93,11 +98,12 @@ export default function JournalPage() {
 
       <BulkDeleteBar
         selectedCount={selectedIds.size}
+        itemLabel="entry"
         onDelete={() => setBulkDialogOpen(true)}
         onClear={() => setSelectedIds(new Set())}
       />
 
-      <DeleteScanDialog
+      <DeleteJournalDialog
         open={pendingSingleId !== null}
         onOpenChange={(open) => !open && setPendingSingleId(null)}
         count={1}
@@ -105,7 +111,7 @@ export default function JournalPage() {
         onConfirm={handleSingleDeleteConfirm}
       />
 
-      <DeleteScanDialog
+      <DeleteJournalDialog
         open={bulkDialogOpen}
         onOpenChange={setBulkDialogOpen}
         count={selectedIds.size}

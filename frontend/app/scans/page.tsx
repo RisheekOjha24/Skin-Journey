@@ -38,6 +38,11 @@ export default function ScansPage() {
     setIsDeleting(true);
     try {
       await deleteScan(pendingSingleId);
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(pendingSingleId);
+        return next;
+      });
       setPendingSingleId(null);
     } catch {
       // error toast already handled in the hook

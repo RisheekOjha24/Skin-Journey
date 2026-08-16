@@ -15,26 +15,32 @@ interface JournalEntryCardProps {
   onDelete: (id: string) => void;
 }
 
-export function JournalEntryCard({ entry, selected = false, onSelectChange, onDelete }: JournalEntryCardProps) {
+export function JournalEntryCard({
+  entry,
+  selected = false,
+  onSelectChange,
+  onDelete,
+}: JournalEntryCardProps) {
   return (
-    <Card className={`group relative transition-shadow hover:shadow-raised ${selected ? "ring-2 ring-primary" : ""}`}>
-      {onSelectChange && (
-        <div className="absolute left-3 top-3 z-10">
-          <Checkbox
-            checked={selected}
-            onCheckedChange={(v) => onSelectChange(Boolean(v))}
-            onClick={(e) => e.stopPropagation()}
-            className="h-5 w-5 border-white bg-card/90 shadow-soft data-[state=checked]:bg-primary"
-            aria-label="Select entry"
-          />
-        </div>
-      )}
-
+    <Card
+      className={`group relative transition-shadow hover:shadow-raised ${selected ? "ring-2 ring-primary" : ""}`}
+    >
       <CardContent className="p-5">
-        <div className="flex items-start justify-between">
-          <p className={`text-sm font-medium ${onSelectChange ? "pl-7" : ""}`}>
-            {format(parseUTCDate(entry.entryDate), "EEEE, MMM d, yyyy")}
-          </p>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            {onSelectChange && (
+              <Checkbox
+                checked={selected}
+                onCheckedChange={(v) => onSelectChange(Boolean(v))}
+                onClick={(e) => e.stopPropagation()}
+                className="h-5 w-5 border-2 border-primary/60 bg-background shadow-sm data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                aria-label="Select entry"
+              />
+            )}
+            <p className="text-sm font-medium">
+              {format(parseUTCDate(entry.entryDate), "EEEE, MMM d, yyyy")}
+            </p>
+          </div>
           <Button
             variant="ghost"
             size="icon"
@@ -58,12 +64,26 @@ export function JournalEntryCard({ entry, selected = false, onSelectChange, onDe
 
         <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
           {entry.sleepHours !== null && <p>Sleep: {entry.sleepHours}h</p>}
-          {entry.waterIntakeLiters !== null && <p>Water: {entry.waterIntakeLiters}L</p>}
+          {entry.waterIntakeLiters !== null && (
+            <p>Water: {entry.waterIntakeLiters}L</p>
+          )}
         </div>
 
-        {entry.routineMorning && <p className="mt-2 text-sm"><span className="font-medium">Morning: </span>{entry.routineMorning}</p>}
-        {entry.routineEvening && <p className="mt-1 text-sm"><span className="font-medium">Evening: </span>{entry.routineEvening}</p>}
-        {entry.notes && <p className="mt-2 text-sm text-muted-foreground">{entry.notes}</p>}
+        {entry.routineMorning && (
+          <p className="mt-2 text-sm">
+            <span className="font-medium">Morning: </span>
+            {entry.routineMorning}
+          </p>
+        )}
+        {entry.routineEvening && (
+          <p className="mt-1 text-sm">
+            <span className="font-medium">Evening: </span>
+            {entry.routineEvening}
+          </p>
+        )}
+        {entry.notes && (
+          <p className="mt-2 text-sm text-muted-foreground">{entry.notes}</p>
+        )}
       </CardContent>
     </Card>
   );

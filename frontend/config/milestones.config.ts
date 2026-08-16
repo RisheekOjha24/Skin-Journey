@@ -29,3 +29,15 @@ export const MILESTONE_CATEGORY_COLORS: Record<MilestoneCategory, string> = {
   lifestyle_change: "#4A8BA8",
   other: "#6B6862",
 };
+
+export const MILESTONE_DELETE_COPY = {
+  single: {
+    title: "Delete milestone?",
+    description:
+      "This permanently removes this milestone from your timeline. This action cannot be undone.",
+  },
+  bulk: (count: number) => ({
+    title: `Delete ${count} milestones?`,
+    description: `This permanently removes ${count} selected milestones from your timeline. This action cannot be undone.`,
+  }),
+} as const;
