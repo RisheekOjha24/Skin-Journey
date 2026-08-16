@@ -26,16 +26,22 @@ function getClient(): GoogleGenerativeAI {
 }
 
 const SUMMARY_SYSTEM_INSTRUCTION = `You are a data-summarization assistant inside a skincare tracking app called Skin Journey.
-You will be given a user's historical skin-metric measurements (from a validated skin analysis API) and their own journal notes.
+You will be given a user's historical skin-metric measurements and journal notes.
+
+Your task is to generate a concise, premium "5-second takeaway" summary structured strictly as a JSON object.
+
+The JSON object MUST contain the following keys:
+1. "headline": A short, confident headline summarizing overall skin progress (e.g., "Great progress this week.", "Steady progress overall.", "Skin condition is stable.", or "Skin metrics require attention.").
+2. "scoreChange": A clear sentence describing the overall skin score change from earliest scan to latest scan (e.g., "Your overall skin score increased from 68 to 76.", "Your overall skin score remained steady at 72.").
+3. "biggestImprovements": An array of top 2-3 improved metrics with their score changes formatted like "Metric Name +Change" (e.g., ["Radiance +8", "Texture +7", "Moisture +6"]). If no metrics improved, list key stable metrics or empty array.
+4. "whatChanged": A very short explanation (1-2 sentences) describing the meaningful visual or metric changes between the scans.
+5. "focusNext": A short section (1-2 sentences) with actionable priorities based on the metrics.
 
 Rules you must follow strictly:
-- Only describe trends that are directly supported by the numeric data provided.
-- Never invent a number, a prediction, or a future outcome.
-- Never give medical advice, product recommendations, or diagnoses.
-- If the data is too limited to identify a trend, say so plainly instead of speculating.
-- Keep the tone plain, factual, and encouraging without being exaggerated.
-- Reference specific metrics and specific weeks/dates from the data given.
-- Output 3-5 short sentences, plain text, no markdown formatting.`;
+- Base everything strictly on the provided numeric data.
+- Keep copy concise, minimal, clean, and factual.
+- Avoid generic AI filler, excessive explanation, medical claims, or long paragraphs.
+- Output ONLY valid JSON. Do not wrap in markdown code blocks like \`\`\`json.`;
 
 export const geminiService = {
   async generateProgressSummary(dataPayload: string): Promise<string> {
@@ -47,14 +53,18 @@ export const geminiService = {
       });
 
       const result = await model.generateContent(dataPayload);
-      const text = result.response.text().trim();
+      let text = result.response.text().trim();
 
       if (!text) {
         throw ApiError.externalApi("The AI summary service returned an empty response.");
       }
 
+      // Clean markdown code blocks if model included them
+      text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+
       return text;
     } catch (error) {
+      console.error("Gemini service summary generation error:", error);
       if (error instanceof ApiError) throw error;
       logger.error("Gemini summary generation failed", { error: (error as Error).message });
       throw ApiError.externalApi("Could not generate an AI summary right now. Please try again shortly.");

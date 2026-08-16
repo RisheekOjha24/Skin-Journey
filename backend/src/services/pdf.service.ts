@@ -115,7 +115,28 @@ export const pdfService = {
     if (latestSummary) {
       doc.fillColor(COLORS.ink).fontSize(14).font("Helvetica-Bold").text("AI-Generated Progress Summary");
       doc.moveDown(0.3);
-      doc.fontSize(10).font("Helvetica").fillColor(COLORS.muted).text(latestSummary.summary_text, {
+
+      let summaryContent = latestSummary.summary_text;
+      try {
+        const parsed = JSON.parse(latestSummary.summary_text);
+        if (parsed && typeof parsed === "object") {
+          const parts: string[] = [];
+          if (parsed.headline) parts.push(parsed.headline);
+          if (parsed.scoreChange) parts.push(parsed.scoreChange);
+          if (parsed.biggestImprovements && Array.isArray(parsed.biggestImprovements) && parsed.biggestImprovements.length > 0) {
+            parts.push(`Biggest Improvements: ${parsed.biggestImprovements.join(" · ")}`);
+          }
+          if (parsed.whatChanged) parts.push(`What Changed: ${parsed.whatChanged}`);
+          if (parsed.focusNext) parts.push(`Focus Next: ${parsed.focusNext}`);
+          if (parts.length > 0) {
+            summaryContent = parts.join("\n\n");
+          }
+        }
+      } catch {
+        // use raw text
+      }
+
+      doc.fontSize(10).font("Helvetica").fillColor(COLORS.muted).text(summaryContent, {
         width: CONTENT_WIDTH,
       });
       doc.moveDown(0.3);
