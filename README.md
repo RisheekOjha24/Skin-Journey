@@ -20,7 +20,7 @@ Each folder is independently runnable and has its own `package.json` and `.env.e
 
 ## Prerequisites
 
-- Node.js 20+ and npm
+- Node.js >=20 and <=22 
 - A YouCam / Perfect Corp API key (optional to start — see **Mock Mode** below)
 - A Google Gemini API key (optional — only needed for the AI progress summary feature)
 
