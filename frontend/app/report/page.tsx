@@ -20,6 +20,20 @@ interface ParsedAiSummary {
   focusNext?: string;
 }
 
+/**
+ * SQLite's datetime('now') returns "YYYY-MM-DD HH:MM:SS" with no timezone marker.
+ * Passing that directly to new Date() is ambiguous — different JS engines treat it
+ * as local or UTC. We force it to UTC by normalizing to ISO 8601 with a Z suffix.
+ */
+function parseUtcTimestamp(value: string): Date {
+  // Already a proper ISO string (has T and Z or +offset) — use as-is
+  if (value.includes("T") || value.includes("+") || value.endsWith("Z")) {
+    return new Date(value);
+  }
+  // SQLite format: "YYYY-MM-DD HH:MM:SS" — treat as UTC
+  return new Date(value.replace(" ", "T") + "Z");
+}
+
 function parseSummaryText(text: string): ParsedAiSummary | null {
   try {
     const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
@@ -182,14 +196,14 @@ export default function ReportPage() {
                           {/* Footer Info */}
                           <div className="pt-3 border-t border-border/40 text-[11px] text-muted-foreground flex items-center justify-between">
                             <span>Based on {summary.scanCount} scans</span>
-                            <span>Generated {format(new Date(summary.generatedAt), "MMM d, yyyy 'at' h:mm a")}</span>
+                            <span>Generated {format(parseUtcTimestamp(summary.generatedAt), "MMM d, yyyy 'at' h:mm a")}</span>
                           </div>
                         </div>
                       ) : (
                         <div className="rounded-md bg-accent-soft/50 p-4 text-sm leading-relaxed">
                           <p>{summary.summaryText}</p>
                           <p className="mt-3 text-xs text-muted-foreground">
-                            Based on {summary.scanCount} scans · generated {format(new Date(summary.generatedAt), "MMM d, yyyy 'at' h:mm a")}
+                            Based on {summary.scanCount} scans · generated {format(parseUtcTimestamp(summary.generatedAt), "MMM d, yyyy 'at' h:mm a")}
                           </p>
                         </div>
                       )}
