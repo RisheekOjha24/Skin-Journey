@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { format } from "date-fns";
-import { Download, Loader2, Sparkles } from "lucide-react";
+import { Download, Loader2, Sparkles, FileText, CheckCircle2 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/common/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -67,18 +67,26 @@ export default function ReportPage() {
     <AppShell>
       <PageHeader title="Report" description="An AI-generated summary of your measured trends, and a full dermatologist-ready PDF." />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-4 w-4 text-primary" />
-              AI Progress Summary
-            </CardTitle>
-            <CardDescription>
-              A concise, 5-second takeaway generated from your stored scan history — factual, clear, and actionable.
+      <div className="space-y-6 w-full">
+        {/* TOP SECTION: AI Progress Summary */}
+        <Card className="overflow-hidden border-primary/20 shadow-sm">
+          <CardHeader className="bg-muted/30 border-b border-border/40 pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                AI Progress Summary
+              </CardTitle>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Trend Analysis
+              </span>
+            </div>
+            <CardDescription className="text-xs text-muted-foreground mt-1">
+              A comprehensive AI progress report generated from your stored scan history — factual, detailed, and actionable.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+          <CardContent className="p-6 space-y-5">
             {scans.length < 2 ? (
               <Alert>
                 <AlertDescription>Add at least two scans before generating an AI summary.</AlertDescription>
@@ -107,7 +115,7 @@ export default function ReportPage() {
                               </span>
                             </div>
                             <span className="text-[11px] font-medium uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
-                              5-sec Summary
+                              AI Progress Analysis
                             </span>
                           </div>
 
@@ -189,7 +197,7 @@ export default function ReportPage() {
                   );
                 })() : null}
                 <div>
-                  <Button onClick={generate} disabled={isGenerating} className="gap-2 mt-2">
+                  <Button onClick={generate} disabled={isGenerating} className="gap-2">
                     {isGenerating && <Loader2 className="h-4 w-4 animate-spin" />}
                     {summary ? "Regenerate summary" : "Generate summary"}
                   </Button>
@@ -199,24 +207,60 @@ export default function ReportPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Dermatologist Report</CardTitle>
-            <CardDescription>
-              A complete PDF with your scan history, overlays, comparisons, AI summary, and journal notes — ready to
-              share with a professional.
+        {/* BOTTOM SECTION: Dermatologist PDF Report */}
+        <Card className="overflow-hidden border-border/60 shadow-sm">
+          <CardHeader className="bg-muted/30 border-b border-border/40 pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <FileText className="h-4 w-4" />
+                </div>
+                Dermatologist PDF Report
+              </CardTitle>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                PDF Export
+              </span>
+            </div>
+            <CardDescription className="text-xs text-muted-foreground mt-1">
+              A comprehensive report ready to share with a professional dermatologist or healthcare practitioner.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6 space-y-5">
             {scans.length === 0 ? (
               <Alert>
                 <AlertDescription>Add at least one scan before generating a report.</AlertDescription>
               </Alert>
             ) : (
-              <Button onClick={handleDownload} disabled={isDownloading} className="gap-2">
-                {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                Download PDF report
-              </Button>
+              <div className="space-y-5">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>Complete scan history with metric scores & dates</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>Side-by-side photo overlays and visual analysis</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>Structured AI progress summary & measured trends</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>Recorded journal notes, milestones & routines</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-border/40 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    Format: High-resolution PDF document
+                  </span>
+                  <Button onClick={handleDownload} disabled={isDownloading} className="gap-2">
+                    {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                    Download PDF report
+                  </Button>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -25,22 +25,22 @@ function getClient(): GoogleGenerativeAI {
   return client;
 }
 
-const SUMMARY_SYSTEM_INSTRUCTION = `You are a data-summarization assistant inside a skincare tracking app called Skin Journey.
-You will be given a user's historical skin-metric measurements and journal notes.
+const SUMMARY_SYSTEM_INSTRUCTION = `You are an expert skin data analyst inside the skincare tracking application Skin Journey.
+You will be given a user's chronological historical skin-metric measurements and journal notes.
 
-Your task is to generate a concise, premium "5-second takeaway" summary structured strictly as a JSON object.
+Your task is to generate a comprehensive, high-value AI progress analysis structured strictly as a JSON object.
 
 The JSON object MUST contain the following keys:
-1. "headline": A short, confident headline summarizing overall skin progress (e.g., "Great progress this week.", "Steady progress overall.", "Skin condition is stable.", or "Skin metrics require attention.").
-2. "scoreChange": A clear sentence describing the overall skin score change from earliest scan to latest scan (e.g., "Your overall skin score increased from 68 to 76.", "Your overall skin score remained steady at 72.").
-3. "biggestImprovements": An array of top 2-3 improved metrics with their score changes formatted like "Metric Name +Change" (e.g., ["Radiance +8", "Texture +7", "Moisture +6"]). If no metrics improved, list key stable metrics or empty array.
-4. "whatChanged": A very short explanation (1-2 sentences) describing the meaningful visual or metric changes between the scans.
-5. "focusNext": A short section (1-2 sentences) with actionable priorities based on the metrics.
+1. "headline": A strong, encouraging summary headline capturing overall skin progress (e.g., "Significant Skin Progress Recorded", "Steady & Hydrated Baseline Maintained", "Noticeable Texture & Clarity Improvements").
+2. "scoreChange": A detailed sentence describing the overall skin score progression from baseline to current scan (e.g., "Your overall skin score increased from 68 in your baseline scan to 76 in your latest scan, showing a +8 point overall improvement.").
+3. "biggestImprovements": An array of top 3-4 improved or key metrics with their score deltas (e.g., ["Radiance +8", "Texture +7", "Moisture +6", "Firmness +4"]). If no metrics improved, list key stable metrics.
+4. "whatChanged": A comprehensive 3-4 sentence narrative detailing the measured skin changes between scans. Highlight specific metric trends (e.g. radiance boost, texture smoothing, pore refinement, moisture levels) and connect them with factual context from journal notes if applicable.
+5. "focusNext": A clear, 2-3 sentence actionable priority section providing strategic skincare guidance (e.g., hydration focus, barrier maintenance, targeting specific metrics).
 
 Rules you must follow strictly:
-- Base everything strictly on the provided numeric data.
-- Keep copy concise, minimal, clean, and factual.
-- Avoid generic AI filler, excessive explanation, medical claims, or long paragraphs.
+- Base every single insight strictly on the provided numeric data and journal notes.
+- Do not invent speculative predictions, medical diagnoses, or unmeasured claims.
+- Keep the language elegant, professional, engaging, and rich with data context.
 - Output ONLY valid JSON. Do not wrap in markdown code blocks like \`\`\`json.`;
 
 export const geminiService = {

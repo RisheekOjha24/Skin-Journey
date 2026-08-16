@@ -43,7 +43,7 @@ function buildSummaryPayload(userId: string): { payload: string; start: string; 
     "JOURNAL ENTRIES (user-provided context, not verified facts):",
     ...(journalLines.length ? journalLines : ["(no journal entries recorded)"]),
     "",
-    "Task: Generate a 5-second takeaway summary strictly in JSON format with keys: headline, scoreChange, biggestImprovements, whatChanged, focusNext.",
+    "Task: Generate a comprehensive AI progress analysis strictly in JSON format with keys: headline, scoreChange, biggestImprovements, whatChanged, focusNext.",
   ].join("\n");
 
   return {
