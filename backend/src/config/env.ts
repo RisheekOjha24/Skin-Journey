@@ -29,7 +29,6 @@ const envSchema = z.object({
     .url()
     .default("https://yce-api-01.makeupar.com"),
   YOUCAM_API_KEY: z.string().optional().default(""),
-  YOUCAM_CLIENT_ID: z.string().optional().default(""),
   YOUCAM_MOCK_MODE: z
     .enum(["true", "false"])
     .default("true")

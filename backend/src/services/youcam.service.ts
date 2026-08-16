@@ -41,9 +41,6 @@ function getYouCamClient(): AxiosInstance {
       baseURL: env.YOUCAM_API_BASE_URL,
       defaultHeaders: {
         Authorization: `Bearer ${env.YOUCAM_API_KEY}`,
-        ...(env.YOUCAM_CLIENT_ID
-          ? { "X-Client-Id": env.YOUCAM_CLIENT_ID }
-          : {}),
       },
     });
   }
