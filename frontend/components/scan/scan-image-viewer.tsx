@@ -14,6 +14,7 @@ interface ScanImageViewerProps {
   onRemove?: () => void;
   showControls?: boolean;
   title?: string;
+  isDisabled?: boolean;
 }
 
 export function ScanImageViewer({
@@ -24,6 +25,7 @@ export function ScanImageViewer({
   onRemove,
   showControls = true,
   title = "Scan Image View",
+  isDisabled = false,
 }: ScanImageViewerProps) {
   const [objectFit, setObjectFit] = React.useState<"contain" | "cover">("contain");
   const [isFullscreen, setIsFullscreen] = React.useState(false);
@@ -90,12 +92,19 @@ export function ScanImageViewer({
             {allowRemove && onRemove && (
               <button
                 type="button"
+                disabled={isDisabled}
                 onClick={(e) => {
+                  if (isDisabled) return;
                   e.stopPropagation();
                   onRemove();
                 }}
-                title="Remove photo"
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/80 text-destructive-foreground ring-1 ring-white/20 shadow-md backdrop-blur-md transition-all hover:bg-destructive hover:scale-105 active:scale-95"
+                title={isDisabled ? "Cannot remove while analysis is in progress" : "Remove photo"}
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full bg-destructive/80 text-destructive-foreground ring-1 ring-white/20 shadow-md backdrop-blur-md transition-all",
+                  isDisabled
+                    ? "opacity-50 cursor-not-allowed pointer-events-none"
+                    : "hover:bg-destructive hover:scale-105 active:scale-95"
+                )}
                 aria-label="Remove photo"
               >
                 <X className="h-4 w-4 stroke-[2.5]" />

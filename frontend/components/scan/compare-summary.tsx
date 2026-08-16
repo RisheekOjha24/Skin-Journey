@@ -21,8 +21,8 @@ export function CompareSummary({ comparison }: CompareSummaryProps) {
   const beforeScore = before.overallScore;
   const afterScore = after.overallScore;
 
-  // Calculate top improvements and focus areas dynamically from real metric comparisons
-  const { topImprovements, focusAreas, mainChanges } = React.useMemo(() => {
+  // Calculate top improvements, declines, and focus areas dynamically from real metric comparisons
+  const { topImprovements, topRegressions, focusAreas, mainChanges } = React.useMemo(() => {
     // Collect valid metric deltas with improvement magnitudes
     const evaluated = metricComparison.map((m) => {
       const isHigherBetter = true;
@@ -39,14 +39,15 @@ export function CompareSummary({ comparison }: CompareSummaryProps) {
     // Sort by largest improvement first
     const sortedImprovements = [...evaluated]
       .filter((m) => m.direction === "improved")
-      .sort((a, b) => b.improvementValue - a.improvementValue);
+      .sort((a, b) => (b.delta ?? 0) - (a.delta ?? 0));
 
-    // Sort by largest regression/room for improvement
+    // Sort by largest regression/drop (most negative first)
     const sortedRegressions = [...evaluated]
       .filter((m) => m.direction === "regressed")
-      .sort((a, b) => b.improvementValue - a.improvementValue);
+      .sort((a, b) => (a.delta ?? 0) - (b.delta ?? 0));
 
     const topImprovements = sortedImprovements.slice(0, 3);
+    const topRegressions = sortedRegressions.slice(0, 3);
 
     // Focus areas: prioritize regressed metrics or metrics with lowest current score in 'after' scan
     const lowestMetrics = [...evaluated]
@@ -81,13 +82,29 @@ export function CompareSummary({ comparison }: CompareSummaryProps) {
           topImprovements[0].metric as SkinMetric
         ]?.toLowerCase() || "skin clarity";
       mainChanges = `Key visual progress was made in ${m1}, leading to a clearer overall profile.`;
+    } else if (topRegressions.length >= 2) {
+      const m1 =
+        SKIN_METRIC_LABELS[
+          topRegressions[0].metric as SkinMetric
+        ]?.toLowerCase() || "texture";
+      const m2 =
+        SKIN_METRIC_LABELS[
+          topRegressions[1].metric as SkinMetric
+        ]?.toLowerCase() || "radiance";
+      mainChanges = `Your skin registered a temporary decline in ${m1} and ${m2} compared with the benchmark scan.`;
+    } else if (topRegressions.length === 1) {
+      const m1 =
+        SKIN_METRIC_LABELS[
+          topRegressions[0].metric as SkinMetric
+        ]?.toLowerCase() || "texture";
+      mainChanges = `A slight decline was observed in ${m1}, while other parameters remained stable.`;
     } else if (overallScoreDelta !== null && overallScoreDelta >= 0) {
       mainChanges = `Your overall skin condition remains stable with steady baseline metrics across the board.`;
     } else {
       mainChanges = `Minor fluctuations detected across key skin parameters since your last baseline scan.`;
     }
 
-    return { topImprovements, focusAreas, mainChanges };
+    return { topImprovements, topRegressions, focusAreas, mainChanges };
   }, [metricComparison, overallScoreDelta]);
 
   // Headline determination based on overall score delta
@@ -179,24 +196,45 @@ export function CompareSummary({ comparison }: CompareSummaryProps) {
 
         {/* Grid structured summary */}
         <div className="grid gap-4 sm:grid-cols-3 pt-1 border-t border-border/50">
-          {/* 1. Biggest Improvements */}
+          {/* 1. Improvements / Declines */}
           <div className="space-y-1.5">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Biggest improvements
+              {topImprovements.length > 0
+                ? "Biggest improvements"
+                : topRegressions.length > 0
+                ? "Biggest drops"
+                : "Metric changes"}
             </p>
             {topImprovements.length > 0 ? (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-foreground">
                 {topImprovements.map((imp, idx) => {
                   const label = SKIN_METRIC_LABELS[imp.metric as SkinMetric];
                   const absChange = Math.abs(imp.displayDelta);
-                  const isPlus = imp.displayDelta > 0;
                   return (
                     <span key={imp.metric} className="inline-flex items-center">
                       <span className="font-semibold">{label}</span>
-                      <span className="ml-1 font-mono text-positive font-semibold">
-                        {isPlus ? `+${absChange}` : `-${absChange}`}
+                      <span className="ml-1 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                        +{absChange}
                       </span>
                       {idx < topImprovements.length - 1 && (
+                        <span className="ml-2 text-muted-foreground/50">·</span>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+            ) : topRegressions.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-foreground">
+                {topRegressions.map((reg, idx) => {
+                  const label = SKIN_METRIC_LABELS[reg.metric as SkinMetric];
+                  const deltaVal = reg.displayDelta;
+                  return (
+                    <span key={reg.metric} className="inline-flex items-center">
+                      <span className="font-semibold">{label}</span>
+                      <span className="ml-1 font-mono text-amber-600 dark:text-amber-400 font-semibold">
+                        {deltaVal}
+                      </span>
+                      {idx < topRegressions.length - 1 && (
                         <span className="ml-2 text-muted-foreground/50">·</span>
                       )}
                     </span>

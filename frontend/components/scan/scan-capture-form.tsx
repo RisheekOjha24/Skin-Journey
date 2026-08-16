@@ -61,6 +61,7 @@ export function ScanCaptureForm({ scanType, isSubmitting, onSubmit }: ScanCaptur
               src={previewUrl}
               alt="Scan preview"
               allowRemove
+              isDisabled={isSubmitting}
               onRemove={() => handleFile(null)}
               title="Uploaded Scan Preview"
             />

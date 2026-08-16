@@ -15,14 +15,15 @@ import { ScanComparison } from "@/types";
 import { ApiClientError } from "@/lib/api-client";
 import { API_CONFIG } from "@/config/api.config";
 import { SKIN_METRIC_LABELS, SKIN_METRIC_ICONS, SkinMetric } from "@/config/metrics.config";
-import { GitCompareArrows, ArrowRight } from "lucide-react";
-import { parseUTCDate } from "@/lib/utils";
+import { GitCompareArrows, ArrowRight, ArrowLeftRight } from "lucide-react";
+import { parseUTCDate, cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/routes.config";
 import { CustomSelect } from "@/components/ui/custom-select";
 import { MetricInfoTooltip } from "@/components/scan/metric-calculation-info";
 import { CompareSummary } from "@/components/scan/compare-summary";
 import { ScanImageViewer } from "@/components/scan/scan-image-viewer";
+import { Button } from "@/components/ui/button";
 
 export default function ComparePage() {
   const { scans, isLoading: scansLoading } = useScans();
@@ -32,8 +33,17 @@ export default function ComparePage() {
     null,
   );
   const [isComparing, setIsComparing] = React.useState(false);
+  const [isSwapping, setIsSwapping] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const router = useRouter();
+
+  const handleSwap = () => {
+    if (!beforeId || !afterId) return;
+    setIsSwapping(true);
+    setBeforeId(afterId);
+    setAfterId(beforeId);
+    setTimeout(() => setIsSwapping(false), 400);
+  };
 
   React.useEffect(() => {
     if (scans.length >= 2 && !beforeId && !afterId) {
@@ -133,14 +143,31 @@ export default function ComparePage() {
 
       {!isComparing && comparison && (
         <div className="space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {[comparison.before, comparison.after].map((scan, i) => (
-              <Card key={scan.id} className="overflow-hidden">
-                <ScanImageViewer
-                  src={`${API_CONFIG.baseUrl}${scan.imageUrl}`}
-                  alt={i === 0 ? "Before Scan" : "After Scan"}
-                  title={i === 0 ? "Before Scan" : "After Scan"}
-                />
+          <div>
+            {/* Dedicated Sub-Header for Visual Comparison & Swap Images Action */}
+            <div className="flex items-center justify-between px-1 mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Visual Comparison
+              </span>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSwap}
+                className="h-8 gap-2 rounded-full border border-border/80 bg-card/90 px-3.5 text-xs font-medium text-foreground shadow-sm backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-accent hover:border-primary/50 active:scale-95"
+              >
+                <ArrowLeftRight className={cn("h-3.5 w-3.5 text-primary transition-transform duration-300", isSwapping && "rotate-180")} />
+                <span>Swap Images</span>
+              </Button>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              {[comparison.before, comparison.after].map((scan, i) => (
+                <Card key={scan.id} className={cn("overflow-hidden transition-all duration-300", isSwapping && "opacity-60 scale-[0.99]")}>
+                  <ScanImageViewer
+                    src={`${API_CONFIG.baseUrl}${scan.imageUrl}`}
+                    alt={i === 0 ? "Before Scan" : "After Scan"}
+                    title={i === 0 ? "Before Scan" : "After Scan"}
+                  />
                 <CardContent className="flex items-center justify-between p-4">
                   <div className="space-y-0.5">
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -167,6 +194,7 @@ export default function ComparePage() {
                 </CardContent>
               </Card>
             ))}
+            </div>
           </div>
 
           {comparison.overallScoreDelta !== null && (
